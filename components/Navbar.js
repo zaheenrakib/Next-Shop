@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 
 export default function Navbar({ cartCount = 0 }) {
   return (
-    <nav className="sticky top-0 z-50 bg-white border-b border-border shadow-sm">
+    <nav className="sticky top-0 z-50 bg-gray-200 border-b border-border shadow-sm">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
