@@ -24,7 +24,7 @@ async function seedAdmin() {
     const hashedPassword = await bcrypt.hash('admin123', 10);
     const admin = {
       id: uuidv4(),
-      phone: '+8801234567890',
+      phone: '+01780566585',
       password: hashedPassword,
       name: 'Admin User',
       role: 'admin',
