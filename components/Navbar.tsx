@@ -75,7 +75,7 @@ export default function Navbar({ cartCount = 0 }: { cartCount?: number }) {
               </div>
             </Link>
             
-            <Link href="/account" className="flex items-center gap-3 group">
+            <Link href="/account/login" className="flex items-center gap-3 group">
               <div className="p-2 rounded-full bg-white/5 group-hover:bg-primary/20 transition-colors text-primary">
                 <User className="w-6 h-6" />
               </div>
@@ -147,7 +147,7 @@ export default function Navbar({ cartCount = 0 }: { cartCount?: number }) {
                 <Gift className="w-8 h-8 text-primary" />
                 <span className="font-bold">Offers</span>
               </Link>
-              <Link href="/account" className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-white/5">
+              <Link href="/account/login" className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-white/5">
                 <User className="w-8 h-8 text-primary" />
                 <span className="font-bold">Profile</span>
               </Link>
