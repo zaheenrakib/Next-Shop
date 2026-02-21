@@ -22,6 +22,7 @@ import { Badge } from '@/components/ui/badge';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/product/ProductCard';
+import FeaturedCategories from '@/components/FeaturedCategories';
 import { productService } from '@/services/productService';
 import { Product } from '@/types';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -145,6 +146,8 @@ export default function HomePage() {
             ))}
           </div>
         </section>
+
+        <FeaturedCategories />
 
         {/* Featured Products */}
         <section className="py-12">

@@ -19,7 +19,7 @@ export default function ProductCard({ product, onAddToCart, onSelect, actionType
   return (
     <Card className="group overflow-hidden card-hover border-none shadow-md bg-card/50 backdrop-blur-sm">
       <Link href={`/products/${product.slug}`}>
-        <div className="relative aspect-square overflow-hidden bg-muted">
+        <div className="relative aspect-[5/4] overflow-hidden bg-muted">
           <Image
             src={product.images?.[0] || product.image || 'https://images.unsplash.com/photo-1591405351990-4726e33df48c?w=400&h=400&fit=crop'}
             alt={product.name}
@@ -37,27 +37,27 @@ export default function ProductCard({ product, onAddToCart, onSelect, actionType
         </div>
       </Link>
       
-      <CardHeader className="p-4 pb-0">
+      <CardHeader className="p-3 pb-0">
         <div className="flex items-center gap-1 text-yellow-500 mb-1">
           <Star className="w-3 h-3 fill-current" />
-          <span className="text-xs font-semibold">{product.averageRating}</span>
+          <span className="text-[10px] font-bold">{product.averageRating || 0}</span>
         </div>
         <Link href={`/products/${product.slug}`}>
-          <CardTitle className="text-sm font-bold line-clamp-2 min-h-[40px] group-hover:text-primary transition-colors">
+          <CardTitle className="text-sm font-bold line-clamp-2 group-hover:text-primary transition-colors leading-tight">
             {product.name}
           </CardTitle>
         </Link>
       </CardHeader>
 
-      <CardContent className="p-4 pt-2">
-        <div className="text-lg font-bold text-primary">
+      <CardContent className="p-3 pt-2">
+        <div className="text-base font-black text-primary">
           ৳{product.price.toLocaleString()}
         </div>
         {product.keyFeatures && (
-          <ul className="mt-2 space-y-1">
-            {product.keyFeatures.slice(0, 2).map((feature, idx) => (
-              <li key={idx} className="text-[10px] text-muted-foreground flex items-center gap-1">
-                <div className="w-1 h-1 rounded-full bg-primary/50" />
+          <ul className="mt-1.5 space-y-0.5">
+            {product.keyFeatures.slice(0, 1).map((feature, idx) => (
+              <li key={idx} className="text-[9px] text-muted-foreground flex items-center gap-1">
+                <div className="w-1 h-1 rounded-full bg-primary/40" />
                 {feature}
               </li>
             ))}
@@ -65,24 +65,24 @@ export default function ProductCard({ product, onAddToCart, onSelect, actionType
         )}
       </CardContent>
 
-      <CardFooter className="p-4 pt-0">
+      <CardFooter className="p-3 pt-0">
         {actionType === 'cart' ? (
           <Button 
-            className="w-full gap-2 tech-gradient border-none" 
+            className="w-full h-9 gap-2 bg-secondary hover:bg-secondary/90 text-white font-bold text-xs transition-all" 
             onClick={() => onAddToCart?.(product)}
             disabled={product.status === 'Out of Stock'}
           >
-            <ShoppingCart className="w-4 h-4" />
+            <ShoppingCart className="w-3.5 h-3.5" />
             Add to Cart
           </Button>
         ) : (
           <Button 
-            className="w-full gap-2 tech-gradient border-none" 
+            className="w-full h-9 gap-2 bg-primary hover:bg-primary/90 text-white font-bold text-xs transition-all" 
             onClick={() => onSelect?.(product)}
             disabled={product.status === 'Out of Stock'}
           >
-            <Plus className="w-4 h-4" />
-            Select Component
+            <Plus className="w-3.5 h-3.5" />
+            Select
           </Button>
         )}
       </CardFooter>

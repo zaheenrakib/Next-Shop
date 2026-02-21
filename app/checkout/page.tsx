@@ -47,7 +47,7 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background pt-10">
+    <div className="min-h-screen bg-background">
       <Navbar cartCount={items.length} />
       
       <main className="container mx-auto px-4 py-10">
