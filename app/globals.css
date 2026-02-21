@@ -84,7 +84,7 @@
 }
 
 .tech-gradient {
-  @apply bg-gradient-to-br from-primary via-blue-600 to-indigo-700;
+  @apply bg-gradient-to-r from-[#ef4a23] to-[#e7272d] transition-all duration-300;
 }
 
 .card-hover {

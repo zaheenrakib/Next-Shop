@@ -37,6 +37,19 @@ export interface Product {
   };
 }
 
+export interface Offer {
+  id: string;
+  title: string;
+  slug: string;
+  description: string;
+  image: string;
+  startDate: string;
+  endDate: string;
+  status: "Online" | "Offline";
+  details?: string;
+  terms?: string[];
+}
+
 export interface Review {
   id: string;
   userId: string;
