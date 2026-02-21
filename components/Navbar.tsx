@@ -25,7 +25,7 @@ export default function Navbar({ cartCount = 0 }: { cartCount?: number }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-[100] w-full flex flex-col shadow-xl">
+    <header className="sticky top-0 z-[100] w-full flex flex-col shadow-xl">
       {/* Top Bar - Dark Section */}
       <div className="bg-[#081621] w-full py-3 lg:py-5 border-b border-white/5">
         <div className="container mx-auto px-4 flex items-center justify-between gap-4 md:gap-8">
@@ -65,13 +65,23 @@ export default function Navbar({ cartCount = 0 }: { cartCount?: number }) {
               </div>
             </Link>
             
-            <Link href="/account" className="flex items-center gap-3 group">
-              <div className="p-2 rounded-full bg-white/5 group-hover:bg-primary/20 transition-colors">
-                <User className="w-6 h-6 text-primary" />
+            <Link href="/offers" className="flex items-center gap-3 group">
+              <div className="p-2 rounded-full bg-white/5 group-hover:bg-primary/20 transition-colors text-primary">
+                <Zap className="w-6 h-6" />
               </div>
               <div className="hidden xl:block">
-                <p className="text-sm font-bold leading-tight group-hover:text-primary transition-colors">Account</p>
-                <p className="text-[10px] text-gray-400">Login/Register</p>
+                <p className="text-sm font-bold leading-tight group-hover:text-primary transition-colors text-white">Ramadan Deal</p>
+                <p className="text-[10px] text-gray-400">Special Deals</p>
+              </div>
+            </Link>
+            
+            <Link href="/account" className="flex items-center gap-3 group">
+              <div className="p-2 rounded-full bg-white/5 group-hover:bg-primary/20 transition-colors text-primary">
+                <User className="w-6 h-6" />
+              </div>
+              <div className="hidden xl:block">
+                <p className="text-sm font-bold leading-tight group-hover:text-primary transition-colors text-white">Account</p>
+                <p className="text-[10px] text-gray-400">Register or Login</p>
               </div>
             </Link>
 

@@ -65,7 +65,7 @@ export default function ProductDetailsPage({ params }: PageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-background pt-[180px]">
+    <div className="min-h-screen bg-background pt-10">
       <Navbar />
       
       <main className="container mx-auto px-4 py-10">

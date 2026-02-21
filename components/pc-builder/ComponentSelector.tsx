@@ -53,7 +53,7 @@ export default function ComponentSelector({ category }: ComponentSelectorProps) 
   };
 
   return (
-    <div className="max-w-7xl mx-auto pt-[180px] pb-10 px-4">
+    <div className="max-w-7xl mx-auto py-10 px-4">
       <div className="mb-8 flex items-center justify-between">
         <div>
           <Button variant="ghost" onClick={() => router.back()} className="mb-4 gap-2">
