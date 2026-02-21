@@ -13,7 +13,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 221.2 83.2% 53.3%;
+    --primary: 11 87% 54%;
     --primary-foreground: 210 40% 98%;
 
     --secondary: 222.2 47.4% 11.2%;
@@ -32,6 +32,7 @@
     --input: 214.3 31.8% 91.4%;
     --ring: 221.2 83.2% 53.3%;
 
+    --navbar-dark: 206 63% 8%;
     --radius: 0.75rem;
   }
 
@@ -88,4 +89,20 @@
 
 .card-hover {
   @apply transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
+}
+@keyframes marquee {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+
+.animate-marquee {
+  animation: marquee 30s linear infinite;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

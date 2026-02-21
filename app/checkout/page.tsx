@@ -1,6 +1,7 @@
 'use client';
 
 import { useCart } from '@/hooks/useCart';
+import { CartItem } from '@/types';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
@@ -46,7 +47,7 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background pt-20">
+    <div className="min-h-screen bg-background pt-[180px]">
       <Navbar cartCount={items.length} />
       
       <main className="container mx-auto px-4 py-10">

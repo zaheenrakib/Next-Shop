@@ -25,7 +25,7 @@ export default function PCBuilderDashboard() {
   const components = Object.values(build.components);
 
   return (
-    <div className="max-w-5xl mx-auto py-10 px-4">
+    <div className="max-w-5xl mx-auto pt-[180px] pb-10 px-4">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 glass p-6 rounded-2xl shadow-lg">
         <div>
           <h1 className="text-3xl font-extrabold text-secondary dark:text-white">PC Builder</h1>

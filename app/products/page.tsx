@@ -38,7 +38,7 @@ export default function ProductsPage() {
     <div className="min-h-screen bg-background">
       <Navbar cartCount={0} /> {/* Cart count will be handled by state later */}
       
-      <main className="container mx-auto px-4 py-10">
+      <main className="container mx-auto px-4 pt-[180px] pb-10">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10">
           <div>
             <h1 className="text-4xl font-extrabold text-secondary dark:text-white tracking-tight">Browse Gadgets</h1>
