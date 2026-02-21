@@ -63,7 +63,7 @@ export default function HomePage() {
 
       <main>
         {/* Banner Section */}
-        <section className="container mx-auto px-4 py-6">
+        <section className="container mx-auto px-4 py-6 mt-12">
           <div className="flex flex-col lg:flex-row gap-5">
             {/* Main Slider */}
             <div className="lg:w-3/4 w-full h-[250px] md:h-[450px] rounded-2xl overflow-hidden shadow-sm border border-gray-100 relative group">

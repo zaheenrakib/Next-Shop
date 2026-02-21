@@ -74,7 +74,7 @@ export default function ProductDetailsPage({ params }: PageProps) {
           <div className="w-full lg:w-1/2">
             <div className="relative aspect-square rounded-[2.5rem] overflow-hidden glass shadow-2xl group">
               <Image 
-                src={product.image} 
+                src={product.images?.[0] || product.image || 'https://images.unsplash.com/photo-1591405351990-4726e33df48c?w=400&h=400&fit=crop'} 
                 alt={product.name} 
                 fill 
                 className="object-cover transition-transform duration-700 group-hover:scale-105"
@@ -90,9 +90,9 @@ export default function ProductDetailsPage({ params }: PageProps) {
             <div className="space-y-4">
               <div className="flex items-center gap-1 text-yellow-500">
                 {[...Array(5)].map((_, i) => (
-                  <Star key={i} className={`w-4 h-4 ${i < Math.floor(product.averageRating) ? 'fill-current' : 'text-muted'}`} />
+                  <Star key={i} className={`w-4 h-4 ${i < Math.floor(product.averageRating || 0) ? 'fill-current' : 'text-muted'}`} />
                 ))}
-                <span className="ml-2 text-sm font-bold text-foreground">({product.averageRating})</span>
+                <span className="ml-2 text-sm font-bold text-foreground">({product.averageRating || 0})</span>
                 <span className="mx-2 text-muted-foreground">|</span>
                 <span className="text-sm text-primary font-medium">12 Reviews</span>
               </div>

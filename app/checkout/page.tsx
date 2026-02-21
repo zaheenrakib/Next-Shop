@@ -120,7 +120,7 @@ export default function CheckoutPage() {
                   <div key={item.id} className="flex justify-between items-center gap-4">
                     <div className="flex items-center gap-3">
                       <div className="relative w-12 h-12 rounded-lg overflow-hidden border">
-                        <img src={item.image} alt={item.name} className="object-cover" />
+                        <img src={item.images?.[0] || item.image || 'https://images.unsplash.com/photo-1591405351990-4726e33df48c?w=400&h=400&fit=crop'} alt={item.name} className="object-cover" />
                       </div>
                       <div>
                         <p className="text-sm font-bold line-clamp-1">{item.name}</p>

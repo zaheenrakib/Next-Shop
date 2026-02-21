@@ -61,7 +61,7 @@ export default function PCBuilderDashboard() {
                       <div className="mt-1 flex items-center gap-3">
                         <div className="relative w-12 h-12 rounded-lg overflow-hidden border">
                           <Image 
-                            src={comp.selectedProduct!.image} 
+                            src={comp.selectedProduct!.images?.[0] || comp.selectedProduct!.image || 'https://images.unsplash.com/photo-1591405351990-4726e33df48c?w=400&h=400&fit=crop'} 
                             alt={comp.selectedProduct!.name} 
                             fill 
                             className="object-cover"

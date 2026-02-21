@@ -1,0 +1,23 @@
+
+> nextjs-mongo-template@0.1.0 build
+> next build
+
+  ▲ Next.js 14.2.3
+  - Environments: .env
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+Failed to compile.
+
+./app/api/[[...path]]/route.ts:10:30
+Type error: Could not find a declaration file for module 'uuid'. 'D:/P Project/Stack P/Next-Shop/node_modules/uuid/dist/index.js' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/uuid` if it exists or add a new declaration (.d.ts) file containing `declare module 'uuid';`
+
+[0m [90m  8 |[39m } [36mfrom[39m [32m"@/lib/auth"[39m[33m;[39m[0m
+[0m [90m  9 |[39m [36mimport[39m { sampleProducts } [36mfrom[39m [32m"@/lib/sample-data"[39m[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 10 |[39m [36mimport[39m { v4 [36mas[39m uuidv4 } [36mfrom[39m [32m"uuid"[39m[33m;[39m[0m
+[0m [90m    |[39m                              [31m[1m^[22m[39m[0m
+[0m [90m 11 |[39m[0m
+[0m [90m 12 |[39m [90m// Helper to get user from token[39m[0m
+[0m [90m 13 |[39m [36masync[39m [36mfunction[39m getUserFromToken(request[33m:[39m [33mNextRequest[39m) {[0m

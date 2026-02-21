@@ -21,7 +21,7 @@ export default function ProductCard({ product, onAddToCart, onSelect, actionType
       <Link href={`/products/${product.slug}`}>
         <div className="relative aspect-square overflow-hidden bg-muted">
           <Image
-            src={product.image}
+            src={product.images?.[0] || product.image || 'https://images.unsplash.com/photo-1591405351990-4726e33df48c?w=400&h=400&fit=crop'}
             alt={product.name}
             fill
             className="object-cover transition-transform duration-500 group-hover:scale-110"

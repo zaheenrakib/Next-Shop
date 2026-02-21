@@ -13,14 +13,20 @@ export type Category =
 export interface Product {
   id: string;
   name: string;
-  category: Category | string;
-  price: number;
-  image: string;
   slug: string;
+  price: number;
+  originalPrice?: number;
+  discount?: number;
+  category: Category | string;
   description: string;
-  status: "In Stock" | "Out of Stock";
-  averageRating: number;
-  reviews?: Review[];
+  image?: string;
+  images?: string[];
+  stock?: number;
+  rating?: number;
+  reviews?: number;
+  features?: string[];
+  status?: "In Stock" | "Out of Stock";
+  averageRating?: number;
   keyFeatures?: string[];
   // PC Builder specific fields
   compatibility?: {
@@ -55,10 +61,31 @@ export interface CartItem extends Product {
   quantity: number;
 }
 
+export interface Order {
+  id: string;
+  userId: string;
+  items: CartItem[];
+  shippingAddress: {
+    address: string;
+    city: string;
+    zipCode: string;
+  };
+  paymentMethod: string;
+  subtotal: number;
+  shipping: number;
+  total: number;
+  status: "pending" | "processing" | "shipped" | "delivered" | "cancelled";
+  paymentStatus: "pending" | "paid" | "failed";
+  createdAt: string;
+  paidAt?: string;
+  paymentId?: string;
+  updatedAt?: string;
+}
+
 export interface User {
   id: string;
   name: string;
-  email: string;
+  phone: string;
   role: "user" | "admin";
 }
 
