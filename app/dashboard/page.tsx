@@ -89,7 +89,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Greeting */}
-      <div className="text-center mb-10">
+      <div className="mb-10">
         <h1 className="text-4xl font-bold text-gray-900 tracking-tight">
           {getTimeGreeting()} <span className="text-primary">{user?.name}!</span>
         </h1>

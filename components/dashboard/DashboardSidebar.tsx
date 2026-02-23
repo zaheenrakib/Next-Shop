@@ -60,7 +60,7 @@ export default function DashboardSidebar({ user, onLogout }: { user: any; onLogo
                   className={cn(
                     "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group",
                     isActive 
-                      ? "bg-blue-50 text-primary border-r-4 border-primary" 
+                      ? "bg-blue-50 text-primary border-l-4 border-primary" 
                       : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
                   )}
                 >
