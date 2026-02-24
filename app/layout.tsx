@@ -3,7 +3,7 @@ import { Toaster } from 'sonner';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'NextBazaar - Global Ecommerce Marketplace',
+  title: 'NextShop - Global Ecommerce Marketplace',
   description: 'Shop premium products from China to Bangladesh and worldwide. Fast delivery, secure payments, quality guaranteed.',
 };
 
