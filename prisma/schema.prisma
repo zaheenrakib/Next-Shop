@@ -1,0 +1,67 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+}
+
+
+model User {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  phone     String   @unique
+  password  String
+  name      String?
+  role      Role     @default(USER)
+  orders    Order[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model Product {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  slug        String   @unique
+  description String?
+  price       Float
+  images      String[]
+  category    String
+  stock       Int      @default(0)
+  rating      Float    @default(0)
+  numReviews  Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Order {
+  id            String      @id @default(auto()) @map("_id") @db.ObjectId
+  userId        String      @db.ObjectId
+  user          User        @relation(fields: [userId], references: [id])
+  orderItems    Json[]      // Simplified for now
+  shippingInfo  Json
+  paymentResult Json?
+  itemsPrice    Float
+  taxPrice      Float
+  shippingPrice Float
+  totalPrice    Float
+  isPaid        Boolean     @default(false)
+  paidAt        DateTime?
+  isDelivered   Boolean     @default(false)
+  deliveredAt   DateTime?
+  status        OrderStatus @default(PENDING)
+  createdAt     DateTime    @default(now())
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+

@@ -1,50 +1,105 @@
-import { Product, Category } from "../types";
-import { sampleProducts } from "../lib/product-data";
+import Product from '@/models/Product';
+import Variant from '@/models/Variant';
+import VariantAttribute from '@/models/VariantAttribute';
+import Brand from '@/models/Brand';
+import connectDB from '@/lib/db';
+import { v4 as uuidv4 } from 'uuid';
 
-// Simulate an API call with latency
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+export async function createProduct(productData: any, variants: any[]) {
+  await connectDB();
+  
+  // 1. Create Product
+  const slug = productData.name.toLowerCase().split(' ').join('-') + '-' + Date.now();
+  const product = new Product({ ...productData, slug });
+  await product.save();
 
-export const productService = {
-  // Get all products or filter by category
-  getAllProducts: async (category?: Category | string): Promise<Product[]> => {
-    await delay(500);
-    if (category) {
-      return sampleProducts.filter((p) => p.category === category);
+  // 2. Create Variants
+  for (const vData of variants) {
+    const sku = `SKU-${product.name.substring(0, 3).toUpperCase()}-${uuidv4().substring(0, 8).toUpperCase()}`;
+    const variant = new Variant({
+      product: product._id,
+      sku: vData.sku || sku,
+      price: vData.price,
+      stock: vData.stock,
+      image: vData.image || product.thumbnail
+    });
+    await variant.save();
+
+    // 3. Create Variant Attributes
+    if (vData.attributeValues && Array.isArray(vData.attributeValues)) {
+      for (const attrValueId of vData.attributeValues) {
+        const variantAttr = new VariantAttribute({
+          variant: variant._id,
+          attributeValue: attrValueId
+        });
+        await variantAttr.save();
+      }
     }
-    return sampleProducts;
-  },
+  }
 
-  // Get featured products
-  getFeaturedProducts: async (): Promise<Product[]> => {
-    await delay(500);
-    return sampleProducts.slice(0, 8);
-  },
+  return product;
+}
 
-  // Get product by slug
-  getProductBySlug: async (slug: string): Promise<Product | null> => {
-    await delay(300);
-    const product = sampleProducts.find((p) => p.slug === slug);
-    return product || null;
-  },
+export async function getProducts(filters: any = {}, pagination: any = { page: 1, limit: 10 }) {
+  await connectDB();
+  
+  const { category, brand, attributes, search } = filters;
+  const query: any = {};
 
-  // Search products
-  searchProducts: async (query: string): Promise<Product[]> => {
-    await delay(500);
-    const searchTerms = query.toLowerCase().split(" ");
-    return sampleProducts.filter((p) =>
-      searchTerms.every(
-        (term) =>
-          p.name.toLowerCase().includes(term) ||
-          p.category.toLowerCase().includes(term),
-      ),
-    );
-  },
-};
+  if (category) query.category = category;
+  if (brand) query.brand = brand;
+  if (search) query.name = { $regex: search, $options: 'i' };
 
-export const pcBuilderService = {
-  // Get components for a specific category
-  getComponentsByCategory: async (category: Category): Promise<Product[]> => {
-    await delay(500);
-    return sampleProducts.filter((p) => p.category === category);
-  },
-};
+  // Advanced attribute filtering would require aggregation or complex joining
+  // For now, let's stick to basic filters and implement advanced ones in details or specific routes
+  
+  const skip = (pagination.page - 1) * pagination.limit;
+  
+  const products = await Product.find(query)
+    .populate('brand')
+    .populate('category')
+    .skip(skip)
+    .limit(pagination.limit)
+    .sort({ createdAt: -1 })
+    .lean();
+
+  // Get variants for each product to show price
+  const productsWithVariants = await Promise.all(products.map(async (p) => {
+    const variants = await Variant.find({ product: p._id }).lean();
+    return { ...p, variants };
+  }));
+
+  const total = await Product.countDocuments(query);
+
+  return {
+    products: productsWithVariants,
+    total,
+    pages: Math.ceil(total / pagination.limit),
+    currentPage: pagination.page
+  };
+}
+
+export async function getProductById(id: string) {
+  await connectDB();
+  const product = await Product.findById(id).populate('brand').populate('category');
+  if (!product) return null;
+
+  const variants = await Variant.find({ product: id });
+  
+  // Get attributes for each variant
+  const variantsWithAttrs = await Promise.all(variants.map(async (v) => {
+    const attrs = await VariantAttribute.find({ variant: v._id }).populate({
+      path: 'attributeValue',
+      populate: { path: 'attribute' }
+    });
+    return {
+      ...v.toObject(),
+      attributes: attrs.map(a => a.attributeValue)
+    };
+  }));
+
+  return {
+    ...product.toObject(),
+    variants: variantsWithAttrs
+  };
+}

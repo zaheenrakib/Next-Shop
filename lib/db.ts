@@ -1,33 +1,55 @@
-import { MongoClient, Db } from "mongodb";
+import mongoose from 'mongoose';
 
-let client: MongoClient | null = null;
-let clientPromise: Promise<MongoClient> | null = null;
+const MONGODB_URI = process.env.MONGO_URL;
 
-if (!process.env.MONGO_URL) {
-  throw new Error("Please add MONGO_URL to .env");
+if (!MONGODB_URI) {
+  throw new Error('Please define the MONGO_URL environment variable inside .env');
 }
 
-const uri = process.env.MONGO_URL;
-const options = {};
+/**
+ * Global is used here to maintain a cached connection across hot reloads
+ * in development. This prevents connections growing exponentially
+ * during API Route usage.
+ */
+interface MongooseCache {
+  conn: typeof mongoose | null;
+  promise: Promise<typeof mongoose> | null;
+}
 
 declare global {
-  var _mongoClientPromise: Promise<MongoClient> | undefined;
+  var mongoose: MongooseCache;
 }
 
-if (process.env.NODE_ENV === "development") {
-  if (!global._mongoClientPromise) {
-    client = new MongoClient(uri, options);
-    global._mongoClientPromise = client.connect();
+let cached = global.mongoose;
+
+if (!cached) {
+  cached = global.mongoose = { conn: null, promise: null };
+}
+
+async function connectDB() {
+  if (cached.conn) {
+    return cached.conn;
   }
-  clientPromise = global._mongoClientPromise;
-} else {
-  client = new MongoClient(uri, options);
-  clientPromise = client.connect();
+
+  if (!cached.promise) {
+    const opts = {
+      bufferCommands: false,
+      dbName: process.env.DB_NAME || 'ecommerce_db',
+    };
+
+    cached.promise = mongoose.connect(MONGODB_URI!, opts).then((mongoose) => {
+      return mongoose;
+    });
+  }
+
+  try {
+    cached.conn = await cached.promise;
+  } catch (e) {
+    cached.promise = null;
+    throw e;
+  }
+
+  return cached.conn;
 }
 
-export async function getDb(): Promise<Db> {
-  const client = await clientPromise!;
-  return client.db(process.env.DB_NAME || "ecommerce_db");
-}
-
-export default clientPromise;
+export default connectDB;
