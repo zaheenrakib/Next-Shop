@@ -44,7 +44,7 @@ export default function ProductsPage() {
             <h1 className="text-4xl font-extrabold text-secondary dark:text-white tracking-tight">Browse Gadgets</h1>
             <p className="text-muted-foreground mt-2">Discover the latest tech for your setup</p>
           </div>
-          
+
           <div className="relative w-full md:w-96 group">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
             <Input 

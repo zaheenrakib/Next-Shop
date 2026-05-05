@@ -112,7 +112,7 @@ export default function PCBuilderDashboard() {
         <Button 
           size="lg" 
           className="px-10 font-bold tech-gradient" 
-          disabled={!components.every(c => !c.isRequired || c.selectedProduct)}
+          // disabled={!components.every(c => !c.isRequired || c.selectedProduct)}
         >
           Add to Cart
         </Button>

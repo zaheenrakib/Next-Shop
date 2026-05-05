@@ -8,17 +8,17 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import { usePathname } from "next/navigation"; // ১. pathname পাওয়ার জন্য হুকটি ইমপোর্ট করুন
+import { usePathname } from "next/navigation"; 
 
 const UserDashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const pathname = usePathname(); // ২. বর্তমান ইউআরএল পাথ নিন
+  const pathname = usePathname();
 
   const menuItems = [
-    { name: "Dashboard", icon: <LayoutDashboard size={20} />, href: "/admin-dashboard" }, // "/" সরিয়ে স্ট্যান্ডার্ড ফরম্যাট
+    { name: "Dashboard", icon: <LayoutDashboard size={20} />, href: "/admin-dashboard" }, 
     { name: "Sales & Orders", icon: <ShoppingBag size={20} />, href: "/admin-dashboard/sales&orders" },
-    { name: "Inventory", icon: <Package size={20} />, href: "/admin-dashboard/inventory&catalog" },
+    { name: "Products", icon: <Package size={20} />, href: "/admin-dashboard/products" },
     { name: "Users", icon: <Users size={20} />, href: "/admin-dashboard/user-management" },
     { name: "Marketing", icon: <Megaphone size={20} />, href: "/admin-dashboard/marketing-tools" },
     { name: "Analytics", icon: <BarChart3 size={20} />, href: "/admin-dashboard/reports&analytics" },
@@ -51,7 +51,7 @@ const UserDashboardLayout = ({ children }: { children: React.ReactNode }) => {
 
         <nav className="flex-1 px-4 space-y-1 mt-2 overflow-y-auto custom-scrollbar">
           {menuItems.map((item, idx) => {
-            // ৩. একটিভ পাথ চেক করার লজিক
+          
             const isActive = pathname === item.href;
 
             return (
@@ -59,7 +59,7 @@ const UserDashboardLayout = ({ children }: { children: React.ReactNode }) => {
                 <div 
                   className={`flex items-center gap-4 p-3 rounded-xl transition-all cursor-pointer group mb-1 ${
                     isActive 
-                      ? "bg-white/10 text-white" // একটিভ থাকলে ব্যাকগ্রাউন্ড থাকবে
+                      ? "bg-white/10 text-white" 
                       : "hover:bg-white/10 text-gray-300 hover:text-white"
                   }`}
                 >
@@ -89,7 +89,7 @@ const UserDashboardLayout = ({ children }: { children: React.ReactNode }) => {
       </aside>
 
       {/* Main Content & Mobile Sidebar logic stays exactly the same... */}
-      {/* (বাকি কোড অপরিবর্তিত থাকবে, শুধু মোবাইল মেনুর ম্যাপ ফাংশনেও একই isActive লজিক বসিয়ে দিলেই হবে) */}
+      
       
       <div className="flex-1 flex flex-col min-w-0">
         {/* Header... */}
