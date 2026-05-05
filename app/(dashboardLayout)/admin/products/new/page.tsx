@@ -126,7 +126,7 @@ export default function NewProduct() {
                       <SelectValue placeholder="Select Brand" />
                     </SelectTrigger>
                     <SelectContent>
-                      {brands.map(b => <SelectItem key={b._id} value={b._id}>{b.name}</SelectItem>)}
+                      {brands.map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}
                     </SelectContent>
                   </Select>
                 </div>
@@ -137,7 +137,7 @@ export default function NewProduct() {
                       <SelectValue placeholder="Select Category" />
                     </SelectTrigger>
                     <SelectContent>
-                      {categories.map(c => <SelectItem key={c._id} value={c._id}>{c.name}</SelectItem>)}
+                      {categories.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
                     </SelectContent>
                   </Select>
                 </div>
@@ -208,13 +208,13 @@ export default function NewProduct() {
                     <label className="text-sm font-medium">Attributes (e.g. 8GB, Blue)</label>
                     <div className="flex flex-wrap gap-2">
                       {attributes.map(attr => (
-                        <div key={attr._id} className="space-y-1">
+                        <div key={attr.id} className="space-y-1">
                           <span className="text-xs text-muted-foreground">{attr.name}</span>
                           <Select 
                             onValueChange={(val) => {
                               const otherAttrs = variant.attributeValues.filter((vId: string) => {
-                                const valObj = allAttrValues.find(av => av._id === vId);
-                                return valObj?.attribute._id !== attr._id;
+                                const valObj = allAttrValues.find(av => av.id === vId);
+                                return valObj?.attribute.id !== attr.id;
                               });
                               updateVariant(vIdx, 'attributeValues', [...otherAttrs, val]);
                             }}
@@ -224,8 +224,8 @@ export default function NewProduct() {
                             </SelectTrigger>
                             <SelectContent>
                               {allAttrValues
-                                .filter(val => val.attribute._id === attr._id)
-                                .map(val => <SelectItem key={val._id} value={val._id}>{val.value}</SelectItem>)
+                                .filter(val => val.attribute.id === attr.id)
+                                .map(val => <SelectItem key={val.id} value={val.id}>{val.value}</SelectItem>)
                               }
                             </SelectContent>
                           </Select>

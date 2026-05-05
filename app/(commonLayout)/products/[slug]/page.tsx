@@ -31,7 +31,7 @@ export default function ProductDetailsPage({ params }: { params: { slug: string 
       const found = data.products.find((p: any) => p.slug === params.slug);
       
       if (found) {
-        const fullRes = await fetch(`/api/products/${found._id}`);
+        const fullRes = await fetch(`/api/products/${found.id}`);
         const fullProduct = await fullRes.json();
         setProduct(fullProduct);
         
@@ -41,8 +41,8 @@ export default function ProductDetailsPage({ params }: { params: { slug: string 
           
           // Initialize selected attributes from first variant
           const initialAttrs: Record<string, string> = {};
-          fullProduct.variants[0].attributes.forEach((attr: any) => {
-            initialAttrs[attr.attribute.name] = attr._id;
+          fullProduct.variants[0].variantAttributes.forEach((va: any) => {
+            initialAttrs[va.attributeValue.attribute.name] = va.attributeValue.id;
           });
           setSelectedAttrValues(initialAttrs);
         }
@@ -59,8 +59,8 @@ export default function ProductDetailsPage({ params }: { params: { slug: string 
     if (!product) return;
 
     const variant = product.variants.find((v: any) => {
-      return v.attributes.every((attr: any) => {
-        return selectedAttrValues[attr.attribute.name] === attr._id;
+      return v.variantAttributes.every((va: any) => {
+        return selectedAttrValues[va.attributeValue.attribute.name] === va.attributeValue.id;
       });
     });
 
@@ -82,11 +82,12 @@ export default function ProductDetailsPage({ params }: { params: { slug: string 
   // Extract all unique attributes and their values across all variants
   const availableAttrs: Record<string, any[]> = {};
   product.variants.forEach((v: any) => {
-    v.attributes.forEach((a: any) => {
+    v.variantAttributes.forEach((va: any) => {
+      const a = va.attributeValue;
       if (!availableAttrs[a.attribute.name]) {
         availableAttrs[a.attribute.name] = [];
       }
-      if (!availableAttrs[a.attribute.name].find(val => val._id === a._id)) {
+      if (!availableAttrs[a.attribute.name].find(val => val.id === a.id)) {
         availableAttrs[a.attribute.name].push(a);
       }
     });
@@ -147,10 +148,10 @@ export default function ProductDetailsPage({ params }: { params: { slug: string 
                   <div className="flex flex-wrap gap-3">
                     {availableAttrs[attrName].map(val => (
                       <button
-                        key={val._id}
-                        onClick={() => handleAttrChange(attrName, val._id)}
+                        key={val.id}
+                        onClick={() => handleAttrChange(attrName, val.id)}
                         className={`px-4 py-2 rounded-xl border-2 font-bold transition-all ${
-                          selectedAttrValues[attrName] === val._id 
+                          selectedAttrValues[attrName] === val.id 
                           ? 'border-primary bg-primary/10 text-primary' 
                           : 'border-transparent bg-muted hover:bg-muted/80'
                         }`}
@@ -197,10 +198,10 @@ export default function ProductDetailsPage({ params }: { params: { slug: string 
             
             <TabsContent value="specs" className="mt-0">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4">
-                {selectedVariant?.attributes.map((attr: any) => (
-                  <div key={attr._id} className="flex justify-between border-b border-border py-4">
-                    <span className="text-muted-foreground font-medium">{attr.attribute.name}</span>
-                    <span className="font-bold text-right">{attr.value}</span>
+                {selectedVariant?.variantAttributes.map((va: any) => (
+                  <div key={va.id} className="flex justify-between border-b border-border py-4">
+                    <span className="text-muted-foreground font-medium">{va.attributeValue.attribute.name}</span>
+                    <span className="font-bold text-right">{va.attributeValue.value}</span>
                   </div>
                 ))}
                 <div className="flex justify-between border-b border-border py-4">

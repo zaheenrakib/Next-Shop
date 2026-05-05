@@ -80,7 +80,7 @@ export default function CategoryManagement() {
                 <SelectContent>
                   <SelectItem value="none">None (Root)</SelectItem>
                   {categories.map((cat) => (
-                    <SelectItem key={cat._id} value={cat._id}>
+                    <SelectItem key={cat.id} value={cat.id}>
                       {cat.name}
                     </SelectItem>
                   ))}
@@ -110,7 +110,7 @@ export default function CategoryManagement() {
               </TableHeader>
               <TableBody>
                 {categories.map((cat) => (
-                  <TableRow key={cat._id}>
+                  <TableRow key={cat.id}>
                     <TableCell className="font-medium">{cat.name}</TableCell>
                     <TableCell>{cat.parent?.name || '-'}</TableCell>
                     <TableCell className="text-right">

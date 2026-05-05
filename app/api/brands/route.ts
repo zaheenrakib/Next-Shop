@@ -1,11 +1,9 @@
 import { NextResponse } from 'next/server';
-import Brand from '@/models/Brand';
-import connectDB from '@/lib/db';
+import prisma from '@/lib/prisma';
 
 export async function GET() {
   try {
-    await connectDB();
-    const brands = await Brand.find();
+    const brands = await prisma.brand.findMany();
     return NextResponse.json(brands);
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -14,10 +12,10 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
-    await connectDB();
     const { name } = await req.json();
-    const brand = new Brand({ name });
-    await brand.save();
+    const brand = await prisma.brand.create({
+      data: { name },
+    });
     return NextResponse.json(brand, { status: 201 });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 400 });

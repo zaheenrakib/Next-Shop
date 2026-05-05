@@ -1,26 +1,29 @@
-import Attribute from '@/models/Attribute';
-import AttributeValue from '@/models/AttributeValue';
-import connectDB from '@/lib/db';
+import prisma from '@/lib/prisma';
 
 export async function createAttribute(name: string) {
-  await connectDB();
-  const attribute = new Attribute({ name });
-  return await attribute.save();
+  return await prisma.attribute.create({
+    data: { name },
+  });
 }
 
 export async function getAttributes() {
-  await connectDB();
-  return await Attribute.find();
+  return await prisma.attribute.findMany();
 }
 
 export async function createAttributeValue(attributeId: string, value: string) {
-  await connectDB();
-  const attributeValue = new AttributeValue({ attribute: attributeId, value });
-  return await attributeValue.save();
+  return await prisma.attributeValue.create({
+    data: {
+      attributeId,
+      value,
+    },
+  });
 }
 
 export async function getAttributeValues(attributeId?: string) {
-  await connectDB();
-  const query = attributeId ? { attribute: attributeId } : {};
-  return await AttributeValue.find(query).populate('attribute');
+  return await prisma.attributeValue.findMany({
+    where: attributeId ? { attributeId } : {},
+    include: {
+      attribute: true,
+    },
+  });
 }

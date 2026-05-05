@@ -4,13 +4,13 @@ import { createProduct, getProducts } from '@/services/productService';
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
-    const category = searchParams.get('category');
-    const brand = searchParams.get('brand');
+    const categoryId = searchParams.get('category');
+    const brandId = searchParams.get('brand');
     const search = searchParams.get('search');
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '10');
 
-    const result = await getProducts({ category, brand, search }, { page, limit });
+    const result = await getProducts({ categoryId, brandId, search }, { page, limit });
     return NextResponse.json(result);
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

@@ -45,7 +45,7 @@ export default function ProductsPage() {
     const allValues = await attrRes.json();
     const grouped: any[] = [];
     allValues.forEach((val: any) => {
-      const attr = grouped.find(a => a._id === val.attribute._id);
+      const attr = grouped.find(a => a.id === val.attribute.id);
       if (attr) {
         attr.values.push(val);
       } else {
@@ -117,9 +117,9 @@ export default function ProductsPage() {
                     </button>
                     {categories.map(cat => (
                       <button 
-                        key={cat._id}
-                        onClick={() => setSelectedCategory(cat._id)}
-                        className={`w-full text-left px-3 py-2 rounded-lg transition-all text-sm font-medium flex justify-between items-center ${selectedCategory === cat._id ? 'bg-primary text-white' : 'hover:bg-muted'}`}
+                        key={cat.id}
+                        onClick={() => setSelectedCategory(cat.id)}
+                        className={`w-full text-left px-3 py-2 rounded-lg transition-all text-sm font-medium flex justify-between items-center ${selectedCategory === cat.id ? 'bg-primary text-white' : 'hover:bg-muted'}`}
                       >
                         {cat.name} <ChevronRight className="w-4 h-4" />
                       </button>
@@ -132,8 +132,8 @@ export default function ProductsPage() {
                   <h3 className="font-bold text-lg">Brands</h3>
                   <div className="space-y-3">
                     {brands.map(brand => (
-                      <div key={brand._id} className="flex items-center space-x-2 cursor-pointer group" onClick={() => toggleBrand(brand._id)}>
-                        <Checkbox checked={selectedBrands.includes(brand._id)} />
+                      <div key={brand.id} className="flex items-center space-x-2 cursor-pointer group" onClick={() => toggleBrand(brand.id)}>
+                        <Checkbox checked={selectedBrands.includes(brand.id)} />
                         <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer group-hover:text-primary transition-colors">
                           {brand.name}
                         </label>
@@ -145,12 +145,12 @@ export default function ProductsPage() {
                 {/* Attributes */}
                 <Accordion type="multiple" className="w-full">
                   {attributes.map(attr => (
-                    <AccordionItem key={attr._id} value={attr._id} className="border-none">
+                    <AccordionItem key={attr.id} value={attr.id} className="border-none">
                       <AccordionTrigger className="font-bold py-3 hover:no-underline">{attr.name}</AccordionTrigger>
                       <AccordionContent className="pt-1 pb-4">
                         <div className="space-y-3">
                           {attr.values.map((val: any) => (
-                            <div key={val._id} className="flex items-center space-x-2">
+                            <div key={val.id} className="flex items-center space-x-2">
                               <Checkbox />
                               <label className="text-sm font-medium leading-none">{val.value}</label>
                             </div>
@@ -183,7 +183,7 @@ export default function ProductsPage() {
             ) : products.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                 {products.map(product => (
-                  <ProductCard key={product._id} product={product} />
+                  <ProductCard key={product.id} product={product} />
                 ))}
               </div>
             ) : (

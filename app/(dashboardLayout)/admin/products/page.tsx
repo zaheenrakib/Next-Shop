@@ -74,7 +74,7 @@ export default function AdminProducts() {
               </TableHeader>
               <TableBody>
                 {products.map((p) => (
-                  <TableRow key={p._id}>
+                  <TableRow key={p.id}>
                     <TableCell className="font-medium">
                       <div className="flex items-center gap-3">
                         <img src={p.thumbnail} alt="" className="w-10 h-10 rounded object-cover" />
@@ -97,7 +97,7 @@ export default function AdminProducts() {
                           <Button variant="ghost" size="icon"><ExternalLink className="w-4 h-4" /></Button>
                         </Link>
                         <Button variant="ghost" size="icon"><Edit className="w-4 h-4" /></Button>
-                        <Button variant="ghost" size="icon" className="text-destructive" onClick={() => deleteProduct(p._id)}>
+                        <Button variant="ghost" size="icon" className="text-destructive" onClick={() => deleteProduct(p.id)}>
                           <Trash2 className="w-4 h-4" />
                         </Button>
                       </div>

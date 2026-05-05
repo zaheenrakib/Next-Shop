@@ -1,27 +1,31 @@
-import Category from '@/models/Category';
-import connectDB from '@/lib/db';
+import prisma from '@/lib/prisma';
 
-export async function createCategory(data: { name: string; parent?: string }) {
-  await connectDB();
-  const category = new Category(data);
-  return await category.save();
+export async function createCategory(data: { name: string; parentId?: string | null }) {
+  return await prisma.category.create({
+    data: {
+      name: data.name,
+      parentId: data.parentId || null,
+    },
+  });
 }
 
 export async function getCategories() {
-  await connectDB();
-  return await Category.find().populate('parent');
+  return await prisma.category.findMany({
+    include: {
+      parent: true,
+    },
+  });
 }
 
 export async function getCategoryTree() {
-  await connectDB();
-  const categories = await Category.find().lean();
+  const categories = await prisma.category.findMany();
   
   const buildTree = (parentId: string | null = null): any[] => {
     return categories
-      .filter(cat => String(cat.parent || null) === String(parentId || null))
+      .filter(cat => cat.parentId === parentId)
       .map(cat => ({
         ...cat,
-        children: buildTree(cat._id.toString())
+        children: buildTree(cat.id)
       }));
   };
 

@@ -22,7 +22,7 @@ export default function AttributeManagement() {
 
   useEffect(() => {
     if (selectedAttr) {
-      fetchValues(selectedAttr._id);
+      fetchValues(selectedAttr.id);
     }
   }, [selectedAttr]);
 
@@ -65,13 +65,13 @@ export default function AttributeManagement() {
     try {
       const res = await fetch('/api/attribute-values', {
         method: 'POST',
-        body: JSON.stringify({ attributeId: selectedAttr._id, value: newValue }),
+        body: JSON.stringify({ attributeId: selectedAttr.id, value: newValue }),
         headers: { 'Content-Type': 'application/json' }
       });
       if (res.ok) {
         toast.success('Value added');
         setNewValue('');
-        fetchValues(selectedAttr._id);
+        fetchValues(selectedAttr.id);
       }
     } catch (error) {
       toast.error('Failed to add value');
@@ -112,8 +112,8 @@ export default function AttributeManagement() {
               <TableBody>
                 {attributes.map((attr) => (
                   <TableRow 
-                    key={attr._id} 
-                    className={`cursor-pointer ${selectedAttr?._id === attr._id ? 'bg-muted' : ''}`}
+                    key={attr.id} 
+                    className={`cursor-pointer ${selectedAttr?.id === attr.id ? 'bg-muted' : ''}`}
                     onClick={() => setSelectedAttr(attr)}
                   >
                     <TableCell className="font-medium">{attr.name}</TableCell>
@@ -153,7 +153,7 @@ export default function AttributeManagement() {
                 </TableHeader>
                 <TableBody>
                   {values.map((val) => (
-                    <TableRow key={val._id}>
+                    <TableRow key={val.id}>
                       <TableCell>{val.value}</TableCell>
                     </TableRow>
                   ))}
