@@ -12,10 +12,11 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
-    const category = await createCategory(body);
+    const { name, parent } = await req.json();
+    const category = await createCategory({ name, parentId: parent === 'none' ? null : parent });
     return NextResponse.json(category, { status: 201 });
   } catch (error: any) {
+    console.error('POST /api/categories error:', error);
     return NextResponse.json({ error: error.message }, { status: 400 });
   }
 }
