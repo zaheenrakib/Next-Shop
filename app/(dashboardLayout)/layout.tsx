@@ -16,16 +16,16 @@ const UserDashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname(); // ২. বর্তমান ইউআরএল পাথ নিন
 
   const menuItems = [
-    { name: "Dashboard", icon: <LayoutDashboard size={20} />, href: "/admin-dashboard" },
+    { name: "Dashboard", icon: <LayoutDashboard size={20} />, href: "/admin" },
     { name: "Products", icon: <Package size={20} />, href: "/admin/products" },
     { name: "Add Product", icon: <Plus size={20} />, href: "/admin/products/new" },
     { name: "Categories", icon: <FolderTree size={20} />, href: "/admin/categories" },
     { name: "Attributes", icon: <Settings size={20} />, href: "/admin/attributes" },
-    { name: "Sales & Orders", icon: <ShoppingBag size={20} />, href: "/admin-dashboard/sales&orders" },
-    { name: "Users", icon: <Users size={20} />, href: "/admin-dashboard/user-management" },
-    { name: "Analytics", icon: <BarChart3 size={20} />, href: "/admin-dashboard/reports&analytics" },
-    { name: "Support & Reviews", icon: <MessageSquare size={20} />, href: "/admin-dashboard/support&reviews" },
-    { name: "Settings", icon: <Settings size={20} />, href: "/admin-dashboard/settings" },
+    { name: "Sales & Orders", icon: <ShoppingBag size={20} />, href: "/admin/sales&orders" },
+    { name: "Users", icon: <Users size={20} />, href: "/admin/user-management" },
+    { name: "Analytics", icon: <BarChart3 size={20} />, href: "/admin/reports&analytics" },
+    { name: "Support & Reviews", icon: <MessageSquare size={20} />, href: "/admin/support&reviews" },
+    { name: "Settings", icon: <Settings size={20} />, href: "/admin/settings" },
   ];
 
   return (
