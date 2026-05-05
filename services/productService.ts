@@ -1,50 +1,125 @@
-import { Product, Category } from "../types";
-import { sampleProducts } from "../lib/product-data";
+import prisma from '@/lib/prisma';
+import { v4 as uuidv4 } from 'uuid';
 
-// Simulate an API call with latency
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
-export const productService = {
-  // Get all products or filter by category
-  getAllProducts: async (category?: Category | string): Promise<Product[]> => {
-    await delay(500);
-    if (category) {
-      return sampleProducts.filter((p) => p.category === category);
+export async function createProduct(productData: any, variants: any[]) {
+  const slug = productData.name.toLowerCase().split(' ').join('-') + '-' + Date.now();
+  
+  // Use Prisma transaction or nested writes
+  return await prisma.product.create({
+    data: {
+      name: productData.name,
+      slug,
+      description: productData.description,
+      thumbnail: productData.thumbnail,
+      status: productData.status || 'draft',
+      brand: { connect: { id: productData.brandId } },
+      category: { connect: { id: productData.categoryId } },
+      variants: {
+        create: variants.map((vData) => ({
+          sku: vData.sku || `SKU-${productData.name.substring(0, 3).toUpperCase()}-${uuidv4().substring(0, 8).toUpperCase()}`,
+          price: vData.price,
+          stock: vData.stock,
+          image: vData.image || productData.thumbnail,
+          variantAttributes: {
+            create: (vData.attributeValues || []).map((attrValueId: string) => ({
+              attributeValue: { connect: { id: attrValueId } }
+            }))
+          }
+        }))
+      }
+    },
+    include: {
+      variants: {
+        include: {
+          variantAttributes: {
+            include: {
+              attributeValue: {
+                include: {
+                  attribute: true
+                }
+              }
+            }
+          }
+        }
+      }
     }
-    return sampleProducts;
-  },
+  });
+}
 
-  // Get featured products
-  getFeaturedProducts: async (): Promise<Product[]> => {
-    await delay(500);
-    return sampleProducts.slice(0, 8);
-  },
+export async function getProducts(filters: any = {}, pagination: any = { page: 1, limit: 10 }) {
+  const { categoryId, brandId, search } = filters;
+  const skip = (pagination.page - 1) * pagination.limit;
 
-  // Get product by slug
-  getProductBySlug: async (slug: string): Promise<Product | null> => {
-    await delay(300);
-    const product = sampleProducts.find((p) => p.slug === slug);
-    return product || null;
-  },
+  const where: any = {};
+  if (categoryId) where.categoryId = categoryId;
+  if (brandId) where.brandId = brandId;
+  if (search) where.name = { contains: search, mode: 'insensitive' };
 
-  // Search products
-  searchProducts: async (query: string): Promise<Product[]> => {
-    await delay(500);
-    const searchTerms = query.toLowerCase().split(" ");
-    return sampleProducts.filter((p) =>
-      searchTerms.every(
-        (term) =>
-          p.name.toLowerCase().includes(term) ||
-          p.category.toLowerCase().includes(term),
-      ),
-    );
-  },
-};
+  const [products, total] = await Promise.all([
+    prisma.product.findMany({
+      where,
+      include: {
+        brand: true,
+        category: true,
+        variants: true
+      },
+      skip,
+      take: pagination.limit,
+      orderBy: { createdAt: 'desc' }
+    }),
+    prisma.product.count({ where })
+  ]);
 
-export const pcBuilderService = {
-  // Get components for a specific category
-  getComponentsByCategory: async (category: Category): Promise<Product[]> => {
-    await delay(500);
-    return sampleProducts.filter((p) => p.category === category);
-  },
-};
+  return {
+    products,
+    total,
+    pages: Math.ceil(total / pagination.limit),
+    currentPage: pagination.page
+  };
+}
+
+export async function getProductById(id: string) {
+  return await prisma.product.findUnique({
+    where: { id },
+    include: {
+      brand: true,
+      category: true,
+      variants: {
+        include: {
+          variantAttributes: {
+            include: {
+              attributeValue: {
+                include: {
+                  attribute: true
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+export async function getProductBySlug(slug: string) {
+  return await prisma.product.findUnique({
+    where: { slug },
+    include: {
+      brand: true,
+      category: true,
+      variants: {
+        include: {
+          variantAttributes: {
+            include: {
+              attributeValue: {
+                include: {
+                  attribute: true
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  });
+}

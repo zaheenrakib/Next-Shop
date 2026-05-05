@@ -1,68 +1,97 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Product } from '@/types';
-import { productService } from '@/services/productService';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import Image from 'next/image';
-import { Star, ShoppingCart, ShieldCheck, Truck, RefreshCcw, Check } from 'lucide-react';
+import { Star, ShoppingCart, ShieldCheck, Truck, Check, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { toast } from 'sonner';
 
-interface PageProps {
-  params: {
-    slug: string;
-  };
-}
-
-export default function ProductDetailsPage({ params }: PageProps) {
-  const [product, setProduct] = useState<Product | null>(null);
+export default function ProductDetailsPage({ params }: { params: { slug: string } }) {
+  const [product, setProduct] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [selectedVariant, setSelectedVariant] = useState<any>(null);
+  const [selectedAttrValues, setSelectedAttrValues] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    const fetchProduct = async () => {
-      try {
-        const data = await productService.getProductBySlug(params.slug);
-        setProduct(data);
-      } catch (error) {
-        console.error('Error fetching product:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchProduct();
   }, [params.slug]);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Navbar />
-        <div className="container mx-auto px-4 py-20">
-          <div className="flex flex-col md:flex-row gap-10 animate-pulse">
-            <div className="w-full md:w-1/2 aspect-square bg-muted rounded-3xl" />
-            <div className="w-full md:w-1/2 space-y-6">
-              <div className="h-10 bg-muted rounded w-3/4" />
-              <div className="h-6 bg-muted rounded w-1/4" />
-              <div className="h-32 bg-muted rounded" />
-              <div className="h-12 bg-muted rounded w-1/2" />
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const fetchProduct = async () => {
+    try {
+      // Find product by slug - for now using a search param or similar
+      // In a real app, you'd have an API that finds by slug
+      // For this demo, let's assume we can fetch by slug or use the ID if we had it
+      // Let's fetch all products and find the one with the slug
+      const res = await fetch(`/api/products`);
+      const data = await res.json();
+      const found = data.products.find((p: any) => p.slug === params.slug);
+      
+      if (found) {
+        const fullRes = await fetch(`/api/products/${found.id}`);
+        const fullProduct = await fullRes.json();
+        setProduct(fullProduct);
+        
+        // Default to first variant
+        if (fullProduct.variants?.length > 0) {
+          setSelectedVariant(fullProduct.variants[0]);
+          
+          // Initialize selected attributes from first variant
+          const initialAttrs: Record<string, string> = {};
+          fullProduct.variants[0].variantAttributes.forEach((va: any) => {
+            initialAttrs[va.attributeValue.attribute.name] = va.attributeValue.id;
+          });
+          setSelectedAttrValues(initialAttrs);
+        }
+      }
+    } catch (error) {
+      toast.error('Failed to load product');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  if (!product) {
-    return (
-      <div className="min-h-[70vh] flex flex-col items-center justify-center">
-        <h1 className="text-4xl font-bold">Product Not Found</h1>
-        <Button className="mt-4" onClick={() => window.history.back()}>Go Back</Button>
-      </div>
-    );
-  }
+  // Find variant based on selected attributes
+  useEffect(() => {
+    if (!product) return;
+
+    const variant = product.variants.find((v: any) => {
+      return v.variantAttributes.every((va: any) => {
+        return selectedAttrValues[va.attributeValue.attribute.name] === va.attributeValue.id;
+      });
+    });
+
+    if (variant) {
+      setSelectedVariant(variant);
+    }
+  }, [selectedAttrValues, product]);
+
+  const handleAttrChange = (attrName: string, valueId: string) => {
+    setSelectedAttrValues(prev => ({
+      ...prev,
+      [attrName]: valueId
+    }));
+  };
+
+  if (loading) return <div className="flex items-center justify-center min-h-screen"><Loader2 className="animate-spin w-12 h-12" /></div>;
+  if (!product) return <div className="text-center py-20">Product not found</div>;
+
+  // Extract all unique attributes and their values across all variants
+  const availableAttrs: Record<string, any[]> = {};
+  product.variants.forEach((v: any) => {
+    v.variantAttributes.forEach((va: any) => {
+      const a = va.attributeValue;
+      if (!availableAttrs[a.attribute.name]) {
+        availableAttrs[a.attribute.name] = [];
+      }
+      if (!availableAttrs[a.attribute.name].find(val => val.id === a.id)) {
+        availableAttrs[a.attribute.name].push(a);
+      }
+    });
+  });
 
   return (
     <div className="min-h-screen bg-background">
@@ -74,13 +103,13 @@ export default function ProductDetailsPage({ params }: PageProps) {
           <div className="w-full lg:w-1/2">
             <div className="relative aspect-square rounded-[2.5rem] overflow-hidden glass shadow-2xl group">
               <Image 
-                src={product.images?.[0] || product.image || 'https://images.unsplash.com/photo-1591405351990-4726e33df48c?w=400&h=400&fit=crop'} 
+                src={selectedVariant?.image || product.thumbnail || 'https://images.unsplash.com/photo-1591405351990-4726e33df48c?w=400&h=400&fit=crop'} 
                 alt={product.name} 
                 fill 
                 className="object-cover transition-transform duration-700 group-hover:scale-105"
               />
               <Badge className="absolute top-6 right-6 px-4 py-1.5 text-sm tech-gradient border-none">
-                {product.category}
+                {product.category?.name}
               </Badge>
             </div>
           </div>
@@ -89,10 +118,8 @@ export default function ProductDetailsPage({ params }: PageProps) {
           <div className="w-full lg:w-1/2 space-y-8">
             <div className="space-y-4">
               <div className="flex items-center gap-1 text-yellow-500">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className={`w-4 h-4 ${i < Math.floor(product.averageRating || 0) ? 'fill-current' : 'text-muted'}`} />
-                ))}
-                <span className="ml-2 text-sm font-bold text-foreground">({product.averageRating || 0})</span>
+                {[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4 fill-current" />)}
+                <span className="ml-2 text-sm font-bold text-foreground">(4.5)</span>
                 <span className="mx-2 text-muted-foreground">|</span>
                 <span className="text-sm text-primary font-medium">12 Reviews</span>
               </div>
@@ -102,10 +129,10 @@ export default function ProductDetailsPage({ params }: PageProps) {
               </h1>
               
               <div className="flex items-center gap-4">
-                <span className="text-4xl font-black text-primary">৳{product.price.toLocaleString()}</span>
-                {product.status === 'In Stock' ? (
+                <span className="text-4xl font-black text-primary">৳{selectedVariant?.price.toLocaleString()}</span>
+                {selectedVariant?.stock > 0 ? (
                   <Badge className="bg-green-100 text-green-700 hover:bg-green-100 border-none px-3 font-bold">
-                    <Check className="w-3 h-3 mr-1" /> IN STOCK
+                    <Check className="w-3 h-3 mr-1" /> IN STOCK ({selectedVariant.stock})
                   </Badge>
                 ) : (
                   <Badge variant="destructive" className="px-3 font-bold">OUT OF STOCK</Badge>
@@ -113,29 +140,40 @@ export default function ProductDetailsPage({ params }: PageProps) {
               </div>
             </div>
 
+            {/* Dynamic Attribute Selectors */}
+            <div className="space-y-6 border-y py-6">
+              {Object.keys(availableAttrs).map(attrName => (
+                <div key={attrName} className="space-y-3">
+                  <h3 className="font-bold text-sm uppercase tracking-wider text-muted-foreground">{attrName}</h3>
+                  <div className="flex flex-wrap gap-3">
+                    {availableAttrs[attrName].map(val => (
+                      <button
+                        key={val.id}
+                        onClick={() => handleAttrChange(attrName, val.id)}
+                        className={`px-4 py-2 rounded-xl border-2 font-bold transition-all ${
+                          selectedAttrValues[attrName] === val.id 
+                          ? 'border-primary bg-primary/10 text-primary' 
+                          : 'border-transparent bg-muted hover:bg-muted/80'
+                        }`}
+                      >
+                        {val.value}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+
             <p className="text-lg text-muted-foreground leading-relaxed">
               {product.description}
             </p>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="flex items-start gap-3 p-4 glass rounded-2xl">
-                <ShieldCheck className="w-6 h-6 text-primary" />
-                <div>
-                  <h4 className="font-bold text-sm">Official Warranty</h4>
-                  <p className="text-xs text-muted-foreground">1 Year Replacement Warranty</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3 p-4 glass rounded-2xl">
-                <Truck className="w-6 h-6 text-blue-500" />
-                <div>
-                  <h4 className="font-bold text-sm">Fast Delivery</h4>
-                  <p className="text-xs text-muted-foreground">Free shipping on orders over ৳10,000</p>
-                </div>
-              </div>
-            </div>
-
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
-              <Button size="lg" className="flex-1 tech-gradient h-14 text-lg font-bold shadow-lg shadow-primary/20">
+              <Button 
+                size="lg" 
+                className="flex-1 tech-gradient h-14 text-lg font-bold shadow-lg shadow-primary/20"
+                disabled={!selectedVariant || selectedVariant.stock === 0}
+              >
                 <ShoppingCart className="w-5 h-5 mr-3" />
                 Add to Cart
               </Button>
@@ -156,26 +194,23 @@ export default function ProductDetailsPage({ params }: PageProps) {
               <TabsTrigger value="description" className="rounded-lg px-8 py-2.5 font-bold data-[state=active]:bg-background data-[state=active]:text-primary">
                 Description
               </TabsTrigger>
-              <TabsTrigger value="reviews" className="rounded-lg px-8 py-2.5 font-bold data-[state=active]:bg-background data-[state=active]:text-primary">
-                Reviews (12)
-              </TabsTrigger>
             </TabsList>
             
             <TabsContent value="specs" className="mt-0">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4">
-                {product.keyFeatures?.map((feature, i) => (
-                  <div key={i} className="flex justify-between border-b border-border py-4">
-                    <span className="text-muted-foreground font-medium">{feature.split(':')[0]}</span>
-                    <span className="font-bold text-right">{feature.split(':')[1] || feature}</span>
+                {selectedVariant?.variantAttributes.map((va: any) => (
+                  <div key={va.id} className="flex justify-between border-b border-border py-4">
+                    <span className="text-muted-foreground font-medium">{va.attributeValue.attribute.name}</span>
+                    <span className="font-bold text-right">{va.attributeValue.value}</span>
                   </div>
                 ))}
                 <div className="flex justify-between border-b border-border py-4">
-                  <span className="text-muted-foreground font-medium">Category</span>
-                  <span className="font-bold">{product.category}</span>
+                  <span className="text-muted-foreground font-medium">Brand</span>
+                  <span className="font-bold">{product.brand?.name}</span>
                 </div>
                 <div className="flex justify-between border-b border-border py-4">
-                  <span className="text-muted-foreground font-medium">Status</span>
-                  <span className="font-bold">{product.status}</span>
+                  <span className="text-muted-foreground font-medium">SKU</span>
+                  <span className="font-bold">{selectedVariant?.sku}</span>
                 </div>
               </div>
             </TabsContent>

@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { 
   ShoppingBag, LogOut, Menu, X, Bell, Search, Heart,
   LayoutDashboard, Package, Users, Megaphone, BarChart3,
-  MessageSquare, Settings 
+  MessageSquare, Settings, Plus, FolderTree
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
@@ -16,11 +16,19 @@ const UserDashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname();
 
   const menuItems = [
+<<<<<<< HEAD
     { name: "Dashboard", icon: <LayoutDashboard size={20} />, href: "/admin-dashboard" }, 
     { name: "Sales & Orders", icon: <ShoppingBag size={20} />, href: "/admin-dashboard/sales&orders" },
     { name: "Products", icon: <Package size={20} />, href: "/admin-dashboard/products" },
+=======
+    { name: "Dashboard", icon: <LayoutDashboard size={20} />, href: "/admin-dashboard" },
+    { name: "Products", icon: <Package size={20} />, href: "/admin/products" },
+    { name: "Add Product", icon: <Plus size={20} />, href: "/admin/products/new" },
+    { name: "Categories", icon: <FolderTree size={20} />, href: "/admin/categories" },
+    { name: "Attributes", icon: <Settings size={20} />, href: "/admin/attributes" },
+    { name: "Sales & Orders", icon: <ShoppingBag size={20} />, href: "/admin-dashboard/sales&orders" },
+>>>>>>> 317bcccf4cdddea93f3111fdb8cf2c05b33812be
     { name: "Users", icon: <Users size={20} />, href: "/admin-dashboard/user-management" },
-    { name: "Marketing", icon: <Megaphone size={20} />, href: "/admin-dashboard/marketing-tools" },
     { name: "Analytics", icon: <BarChart3 size={20} />, href: "/admin-dashboard/reports&analytics" },
     { name: "Support & Reviews", icon: <MessageSquare size={20} />, href: "/admin-dashboard/support&reviews" },
     { name: "Settings", icon: <Settings size={20} />, href: "/admin-dashboard/settings" },
