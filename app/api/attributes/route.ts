@@ -16,6 +16,7 @@ export async function POST(req: Request) {
     const attribute = await createAttribute(name);
     return NextResponse.json(attribute, { status: 201 });
   } catch (error: any) {
+    console.error('POST /api/attributes error:', error);
     return NextResponse.json({ error: error.message }, { status: 400 });
   }
 }

@@ -4,7 +4,7 @@ export async function createCategory(data: { name: string; parentId?: string | n
   return await prisma.category.create({
     data: {
       name: data.name,
-      parentId: data.parentId || null,
+      parentId: (data.parentId === 'none' || !data.parentId) ? null : data.parentId,
     },
   });
 }
