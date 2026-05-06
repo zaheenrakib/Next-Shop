@@ -16,7 +16,7 @@ const UserDashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname();
 
   const menuItems = [
-    { name: "Dashboard", icon: <LayoutDashboard size={20} />, href: "/admin-dashboard" },
+    { name: "Dashboard", icon: <LayoutDashboard size={20} />, href: "/admin" },
     { name: "Products", icon: <Package size={20} />, href: "/admin/products" },
     { name: "Add Product", icon: <Plus size={20} />, href: "/admin/products/new" },
     { name: "Categories", icon: <FolderTree size={20} />, href: "/admin/categories" },

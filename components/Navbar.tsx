@@ -10,10 +10,21 @@ import {
   Cpu, 
   Menu, 
   X,
-  ShoppingCart
+  ShoppingCart,
+  LogOut,
+  ChevronDown
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { useSession, signOut } from '@/lib/auth-client';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const categories = [
   "Desktop", "Laptop", "Component", "Monitor", "Processor", "UPS", "Phone", "Tablet", 
@@ -24,11 +35,32 @@ const categories = [
 export default function Navbar({ cartCount = 0 }: { cartCount?: number }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  // useSession() হুক দিয়ে কারেন্ট ইউজারের সেশন ডাটা নেওয়া হচ্ছে
+  const { data, isPending } = useSession();
+  const user = data?.user;
+
+  // লগআউট হ্যান্ডলার
+  const handleLogout = async () => {
+    await signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          window.location.href = "/";
+        }
+      }
+    });
+  };
+
+  // নামের প্রথম অক্ষর বের করার ফাংশন (অবতারের জন্য)
+  const getInitials = (name: string) => {
+    return name ? name.charAt(0).toUpperCase() : 'U';
+  };
+
   return (
     <header className="sticky top-0 z-[100] w-full flex flex-col shadow-xl">
       {/* Top Bar - Dark Section */}
       <div className="bg-[#081621] w-full py-3 lg:py-5 border-b border-white/5">
         <div className="container mx-auto px-4 flex items-center justify-between gap-4 md:gap-8">
+          
           {/* Logo */}
           <Link href="/" className="flex-shrink-0 flex items-center gap-2 group">
             <div className="w-9 h-9 md:w-11 md:h-11 bg-primary rounded-full flex items-center justify-center -rotate-12 group-hover:rotate-0 transition-transform shadow-lg shadow-primary/20">
@@ -75,15 +107,80 @@ export default function Navbar({ cartCount = 0 }: { cartCount?: number }) {
               </div>
             </Link>
             
-            <Link href="/account/login" className="flex items-center gap-3 group">
-              <div className="p-2 rounded-full bg-white/5 group-hover:bg-primary/20 transition-colors text-primary">
-                <User className="w-6 h-6" />
+            {/* ========================================== */}
+            {/* DYNAMIC USER SECTION (DESKTOP)             */}
+            {/* ========================================== */}
+            {isPending ? (
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-white/10 animate-pulse" />
+                <div className="space-y-1">
+                  <div className="h-3 w-16 bg-white/10 rounded animate-pulse" />
+                  <div className="h-2.5 w-24 bg-white/10 rounded animate-pulse" />
+                </div>
               </div>
-              <div className="hidden xl:block">
-                <p className="text-sm font-bold leading-tight group-hover:text-primary transition-colors text-white">Account</p>
-                <p className="text-[10px] text-gray-400">Register or Login</p>
-              </div>
-            </Link>
+            ) : user ? (
+              /* logged in state */
+              <DropdownMenu>
+                <DropdownMenuTrigger className="outline-none">
+                  <div className="flex items-center gap-3 group cursor-pointer">
+                    {/* User Profile Avatar with Fallback */}
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-[#ef4a23] p-[2px] shadow-lg">
+                      <div className="w-full h-full rounded-full bg-[#081621] flex items-center justify-center overflow-hidden">
+                        {user.image ? (
+                          <img src={user.image} alt={user.name} className="w-full h-full object-cover" />
+                        ) : (
+                          <span className="text-sm font-black text-white tracking-wider">
+                            {getInitials(user.name)}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="hidden xl:block text-left max-w-[120px]">
+                      {/* Truncated Name & Email to avoid design breaking */}
+                      <p className="text-sm font-bold leading-tight text-white group-hover:text-primary transition-colors truncate">
+                        {user.name}
+                      </p>
+                      <p className="text-[10px] text-gray-400 truncate">
+                        {user.email}
+                      </p>
+                    </div>
+                    <ChevronDown className="w-4 h-4 text-gray-400 group-hover:text-primary transition-colors hidden xl:block" />
+                  </div>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56 mt-2 bg-white rounded-xl shadow-xl border border-slate-100 p-2 z-[110]" align="end">
+                  <DropdownMenuLabel className="font-bold text-slate-800">My Account</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <Link href="/dashboard">
+                    <DropdownMenuItem className="cursor-pointer font-semibold text-slate-600 focus:bg-slate-50 focus:text-[#3749bb] rounded-lg">
+                      User Dashboard
+                    </DropdownMenuItem>
+                  </Link>
+                  <Link href="/orders">
+                    <DropdownMenuItem className="cursor-pointer font-semibold text-slate-600 focus:bg-slate-50 focus:text-[#3749bb] rounded-lg">
+                      My Orders
+                    </DropdownMenuItem>
+                  </Link>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem 
+                    onClick={handleLogout}
+                    className="cursor-pointer font-bold text-rose-600 focus:bg-rose-50 focus:text-rose-700 rounded-lg flex items-center gap-2"
+                  >
+                    <LogOut className="w-4 h-4" /> Log Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              /* logged out state */
+              <Link href="/account/login" className="flex items-center gap-3 group">
+                <div className="p-2 rounded-full bg-white/5 group-hover:bg-primary/20 transition-colors text-primary">
+                  <User className="w-6 h-6" />
+                </div>
+                <div className="hidden xl:block">
+                  <p className="text-sm font-bold leading-tight group-hover:text-primary transition-colors text-white">Account</p>
+                  <p className="text-[10px] text-gray-400">Register or Login</p>
+                </div>
+              </Link>
+            )}
 
             {/* PC Builder Button */}
             <Link href="/pc-builder">
@@ -100,7 +197,7 @@ export default function Navbar({ cartCount = 0 }: { cartCount?: number }) {
                 Builder
               </Button>
             </Link>
-             <Link href="/cart">
+            <Link href="/cart">
               <Button variant="ghost" size="icon" className="text-white hover:bg-white/5">
                 <ShoppingCart className="w-6 h-6" />
               </Button>
@@ -134,7 +231,7 @@ export default function Navbar({ cartCount = 0 }: { cartCount?: number }) {
       {isMobileMenuOpen && (
         <div className="lg:hidden bg-[#081621] border-t border-white/10 animate-in slide-in-from-top-4 duration-300 max-h-[85vh] overflow-y-auto w-full">
           <div className="container mx-auto px-4 py-8 flex flex-col space-y-6 text-white text-center">
-             <div className="relative">
+            <div className="relative">
               <Input 
                 placeholder="Search products..." 
                 className="w-full bg-white/10 border-white/20 text-white h-12 pr-12 rounded-xl text-lg"
@@ -142,15 +239,62 @@ export default function Navbar({ cartCount = 0 }: { cartCount?: number }) {
               <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-6 h-6 text-white/40" />
             </div>
             
+            {/* ========================================== */}
+            {/* DYNAMIC USER SECTION (MOBILE)              */}
+            {/* ========================================== */}
             <div className="grid grid-cols-2 gap-4">
               <Link href="/offers" className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-white/5">
                 <Gift className="w-8 h-8 text-primary" />
                 <span className="font-bold">Offers</span>
               </Link>
-              <Link href="/account/login" className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-white/5">
-                <User className="w-8 h-8 text-primary" />
-                <span className="font-bold">Profile</span>
-              </Link>
+
+              {user ? (
+                /* logged in state (mobile) */
+                <DropdownMenu>
+                  <DropdownMenuTrigger className="outline-none">
+                    <div className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-white/5 w-full h-full cursor-pointer">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-[#ef4a23] p-[2px]">
+                        <div className="w-full h-full rounded-full bg-[#081621] flex items-center justify-center overflow-hidden">
+                          {user.image ? (
+                            <img src={user.image} alt={user.name} className="w-full h-full object-cover" />
+                          ) : (
+                            <span className="text-sm font-black text-white tracking-wider">
+                              {getInitials(user.name)}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="max-w-[120px] text-center">
+                        <span className="font-bold block truncate text-sm">{user.name}</span>
+                        <span className="text-[10px] text-gray-400 block truncate">{user.email}</span>
+                      </div>
+                    </div>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56 mt-1 bg-white rounded-xl shadow-xl border border-slate-100 p-2 z-[110]" align="center">
+                    <Link href="/dashboard" onClick={() => setIsMobileMenuOpen(false)}>
+                      <DropdownMenuItem className="cursor-pointer font-semibold text-slate-600 focus:bg-slate-50 focus:text-[#3749bb] rounded-lg">
+                        User Dashboard
+                      </DropdownMenuItem>
+                    </Link>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem 
+                      onClick={() => {
+                        handleLogout();
+                        setIsMobileMenuOpen(false);
+                      }}
+                      className="cursor-pointer font-bold text-rose-600 focus:bg-rose-50 focus:text-rose-700 rounded-lg flex items-center gap-2"
+                    >
+                      <LogOut className="w-4 h-4" /> Log Out
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                /* logged out state (mobile) */
+                <Link href="/account/login" className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-white/5" onClick={() => setIsMobileMenuOpen(false)}>
+                  <User className="w-8 h-8 text-primary" />
+                  <span className="font-bold">Profile</span>
+                </Link>
+              )}
             </div>
             
             <div className="pt-4 text-left">
@@ -161,6 +305,7 @@ export default function Navbar({ cartCount = 0 }: { cartCount?: number }) {
                     key={cat}
                     href={`/category/${cat.toLowerCase().replace(' ', '-')}`}
                     className="text-base font-semibold text-gray-300 hover:text-white pl-2 border-l-2 border-white/5"
+                    onClick={() => setIsMobileMenuOpen(false)}
                   >
                     {cat}
                   </Link>

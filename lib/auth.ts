@@ -1,19 +1,11 @@
-import bcrypt from "bcryptjs";
+
 import jwt from "jsonwebtoken";
+import { betterAuth } from "better-auth";
+import { prismaAdapter } from "better-auth/adapters/prisma";
+import prisma from "./prisma"
 
-const JWT_SECRET =
-  process.env.JWT_SECRET || "your-secret-key-change-in-production";
 
-export async function hashPassword(password: string): Promise<string> {
-  return await bcrypt.hash(password, 10);
-}
-
-export async function verifyPassword(
-  password: string,
-  hashedPassword: string,
-): Promise<boolean> {
-  return await bcrypt.compare(password, hashedPassword);
-}
+const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key-change-in-production";
 
 interface UserPayload {
   id: string;
@@ -36,3 +28,13 @@ export function verifyToken(token: string): any {
     return null;
   }
 }
+
+// Better Auth কনফিগারেশন
+export const auth = betterAuth({
+  database: prismaAdapter(prisma, {
+    provider: "mongodb",
+  }),
+  emailAndPassword: {
+    enabled: true, // Better Auth এখন নিজেই অত্যন্ত সিকিউরভাবে পাসওয়ার্ড হ্যাশ করে ডাটাবেজে পাঠাবে
+  },
+});

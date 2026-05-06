@@ -3,50 +3,80 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
+import { CheckCircle2, XCircle, ArrowRight, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { toast } from 'sonner';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import { authClient } from '@/lib/auth-client';
 
 export default function AccountRegisterPage() {
   const router = useRouter();
   const [formData, setFormData] = useState({
     name: '',
+    email: '',
     phone: '',
     password: '',
     confirmPassword: ''
   });
   const [loading, setLoading] = useState(false);
 
+  // মডাল স্টেট ম্যানেজমেন্ট
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalType, setModalType] = useState<'success' | 'error'>('success');
+  const [modalMessage, setModalMessage] = useState('');
+
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (formData.password !== formData.confirmPassword) {
-      toast.error('Passwords do not match');
+      setModalType('error');
+      setModalMessage('Passwords do not match. Please verify your passwords and try again.');
+      setModalOpen(true);
       return;
     }
+
     setLoading(true);
 
     try {
-      const res = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+      // Better Auth-এর মাধ্যমে ফ্রন্টএন্ড থেকে সাইন-আপ ও অটো সাইন-ইন
+      const { data, error } = await authClient.signUp.email({
+        email: formData.email,
+        password: formData.password,
+        name: formData.name,
+        // কাস্টম ফোন নম্বর ডাটাবেজে সেভ করার জন্য
+        data: {
+          phone: formData.phone,
+        },
+        autoSignIn: true, // সাইন-আপের সাথে সাথে ইউজার সেশন জেনারেট হয়ে যাবে
+        callbackURL: '/', // হোম পেজ রিডাইরেক্ট পাথ
       });
 
-      const data = await res.json();
-
-      if (res.ok) {
-        toast.success('Account created successfully!');
-        router.push('/account/login');
+      if (error) {
+        setModalType('error');
+        setModalMessage(error.message || 'Something went wrong during registration.');
+        setModalOpen(true);
       } else {
-        toast.error(data.error || 'Registration failed');
+        setModalType('success');
+        setModalMessage('Your account has been created and you have been logged in automatically! Welcome to NextShop.');
+        setModalOpen(true);
       }
-    } catch (error) {
-      toast.error('An error occurred during registration');
+    } catch (err: any) {
+      console.error('Registration Error:', err);
+      setModalType('error');
+      setModalMessage('An unexpected server error occurred. Please try again later.');
+      setModalOpen(true);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleModalClose = () => {
+    setModalOpen(false);
+    if (modalType === 'success') {
+      router.push('/'); // সরাসরি হোম পেজে পাঠিয়ে দেওয়া হচ্ছে
     }
   };
 
@@ -54,14 +84,16 @@ export default function AccountRegisterPage() {
     <div className="min-h-screen bg-slate-50 flex flex-col">
       <Navbar />
       
-      <main className="flex-grow container mx-auto px-4 py-8">
+      <main className="flex-grow container mx-auto px-4 py-8 relative">
         <nav className="flex items-center gap-2 text-sm text-slate-500 mb-12">
           <Link href="/" className="hover:text-primary transition-colors">
             <span className="sr-only">Home</span>
-            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
+            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
+            </svg>
           </Link>
           <span>/</span>
-          <Link href="/account" className="hover:text-primary transition-colors">Account</Link>
+          <Link href="/account/login" className="hover:text-primary transition-colors">Login</Link>
           <span>/</span>
           <span className="text-slate-900 font-medium italic">Register</span>
         </nav>
@@ -70,50 +102,68 @@ export default function AccountRegisterPage() {
           <h1 className="text-2xl font-black text-slate-900 mb-8">Register Account</h1>
           
           <form onSubmit={handleRegister} className="space-y-5">
+            {/* Full Name */}
             <div className="space-y-2">
               <Label htmlFor="name" className="text-sm font-bold text-slate-700">Full Name</Label>
               <Input
                 id="name"
                 placeholder="Full Name"
-                className="h-12 border-gray-200 rounded-lg"
+                className="h-12 border-gray-200 rounded-lg focus-visible:ring-1 focus-visible:ring-[#3749bb]"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 required
               />
             </div>
+
+            {/* Email Address */}
+            <div className="space-y-2">
+              <Label htmlFor="email" className="text-sm font-bold text-slate-700">Email Address</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="name@example.com"
+                className="h-12 border-gray-200 rounded-lg focus-visible:ring-1 focus-visible:ring-[#3749bb]"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                required
+              />
+            </div>
             
+            {/* Phone Number */}
             <div className="space-y-2">
               <Label htmlFor="phone" className="text-sm font-bold text-slate-700">Phone Number</Label>
               <Input
                 id="phone"
                 placeholder="Phone Number"
-                className="h-12 border-gray-200 rounded-lg"
+                className="h-12 border-gray-200 rounded-lg focus-visible:ring-1 focus-visible:ring-[#3749bb]"
                 value={formData.phone}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                 required
               />
             </div>
             
+            {/* Password */}
             <div className="space-y-2">
               <Label htmlFor="password" id="register-password-label" className="text-sm font-bold text-slate-700">Password</Label>
               <Input
                 id="password"
                 type="password"
                 placeholder="Password"
-                className="h-12 border-gray-200 rounded-lg"
+                className="h-12 border-gray-200 rounded-lg focus-visible:ring-1 focus-visible:ring-[#3749bb]"
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 required
               />
             </div>
 
+            {/* Confirm Password */}
             <div className="space-y-2">
               <Label htmlFor="confirmPassword" id="confirm-password-label" className="text-sm font-bold text-slate-700">Confirm Password</Label>
               <Input
                 id="confirmPassword"
                 type="password"
                 placeholder="Confirm Password"
-                className="h-12 border-gray-200 rounded-lg"
+                className="h-12 border-gray-200 rounded-lg focus-visible:ring-1 focus-visible:ring-[#3749bb]"
                 value={formData.confirmPassword}
                 onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                 required
@@ -122,10 +172,14 @@ export default function AccountRegisterPage() {
 
             <Button 
               type="submit" 
-              className="w-full h-12 bg-[#3749bb] hover:bg-[#2c3a96] text-white font-black rounded-lg transition-colors border-none"
+              className="w-full h-12 bg-[#3749bb] hover:bg-[#2c3a96] text-white font-black rounded-lg transition-colors border-none mt-2"
               disabled={loading}
             >
-              {loading ? 'Creating...' : 'Continue'}
+              {loading ? (
+                <span className="flex items-center gap-2">
+                  <RefreshCw className="w-4 h-4 animate-spin" /> Creating...
+                </span>
+              ) : 'Continue'}
             </Button>
           </form>
 
@@ -138,6 +192,88 @@ export default function AccountRegisterPage() {
       </main>
 
       <Footer />
+
+      {/* ========================================== */}
+      {/* PREMIUM ANIMATED MODAL DIALOG       */}
+      {/* ========================================== */}
+      <AnimatePresence>
+        {modalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            {/* Backdrop Blur */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={handleModalClose}
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            />
+
+            {/* Modal Body */}
+            <motion.div
+              initial={{ scale: 0.9, y: 20, opacity: 0 }}
+              animate={{ scale: 1, y: 0, opacity: 1 }}
+              exit={{ scale: 0.9, y: 20, opacity: 0 }}
+              transition={{ type: 'spring', duration: 0.5 }}
+              className="relative w-full max-w-[400px] bg-white rounded-3xl p-8 text-center shadow-2xl border border-slate-100 overflow-hidden"
+            >
+              {/* Premium Background Soft Glow */}
+              <div className={`absolute -top-20 -left-20 w-40 h-40 rounded-full blur-[80px] pointer-events-none opacity-50 ${
+                modalType === 'success' ? 'bg-emerald-400' : 'bg-rose-400'
+              }`} />
+
+              <div className="flex flex-col items-center">
+                {/* Status Icon Wrapper */}
+                <motion.div
+                  initial={{ rotate: -15, scale: 0.5 }}
+                  animate={{ rotate: 0, scale: 1 }}
+                  transition={{ delay: 0.15, type: 'spring' }}
+                  className={`w-20 h-20 rounded-2xl flex items-center justify-center mb-6 shadow-inner ${
+                    modalType === 'success' 
+                      ? 'bg-emerald-50 text-emerald-500 border border-emerald-100' 
+                      : 'bg-rose-50 text-rose-500 border border-rose-100'
+                  }`}
+                >
+                  {modalType === 'success' ? (
+                    <CheckCircle2 className="w-10 h-10 stroke-[2.2]" />
+                  ) : (
+                    <XCircle className="w-10 h-10 stroke-[2.2]" />
+                  )}
+                </motion.div>
+
+                {/* Title */}
+                <h3 className="text-2xl font-black text-slate-900 mb-3 tracking-tight">
+                  {modalType === 'success' ? 'Welcome to NextShop!' : 'Action Required'}
+                </h3>
+
+                {/* Message Body */}
+                <p className="text-slate-500 text-sm leading-relaxed mb-8 px-2">
+                  {modalMessage}
+                </p>
+
+                {/* Call To Action Button */}
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full">
+                  <Button
+                    onClick={handleModalClose}
+                    className={`w-full h-13 rounded-xl font-bold flex items-center justify-center gap-2 border-none shadow-md transition-all ${
+                      modalType === 'success'
+                        ? 'bg-emerald-500 hover:bg-emerald-600 text-white'
+                        : 'bg-rose-500 hover:bg-rose-600 text-white'
+                    }`}
+                  >
+                    {modalType === 'success' ? (
+                      <>
+                        Go to Homepage <ArrowRight className="w-4 h-4" />
+                      </>
+                    ) : (
+                      'Try Again'
+                    )}
+                  </Button>
+                </motion.div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

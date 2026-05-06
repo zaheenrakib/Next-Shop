@@ -25,6 +25,24 @@ export default function CategoryManagement() {
     setCategories(data);
   };
 
+  const handleDelete = async (id: string) => {
+  setLoading(true);
+  try {
+    const res = await fetch(`/api/categories?id=${id}`, { method: 'DELETE' });
+    if (res.ok) {
+      toast.success('Category deleted successfully');
+      fetchCategories(); 
+    } else {
+      const error = await res.json();
+      toast.error(error.error || 'Failed to delete category');
+    }
+  } catch (error) {
+    toast.error('Failed to delete category');
+  } finally {
+    setLoading(false);
+  }
+};
+
   const handleAddCategory = async () => {
     if (!name) return;
     setLoading(true);
@@ -114,7 +132,7 @@ export default function CategoryManagement() {
                     <TableCell className="font-medium">{cat.name}</TableCell>
                     <TableCell>{cat.parent?.name || '-'}</TableCell>
                     <TableCell className="text-right">
-                      <Button variant="ghost" size="sm" className="text-destructive">Delete</Button>
+                      <Button variant="ghost" size="sm" className="text-destructive" onClick={() => handleDelete(cat.id)}>Delete</Button>
                     </TableCell>
                   </TableRow>
                 ))}
