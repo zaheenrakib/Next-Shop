@@ -50,6 +50,11 @@ export async function getCategories() {
   return await prisma.category.findMany({
     include: {
       parent: true,
+      categoryAttributes: {
+        include: {
+          attribute: true
+        }
+      }
     },
   });
 }

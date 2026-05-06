@@ -4,7 +4,6 @@ import { v4 as uuidv4 } from 'uuid';
 export async function createProduct(productData: any, variants: any[]) {
   const slug = productData.name.toLowerCase().split(' ').join('-') + '-' + Date.now();
   
-  // Use Prisma transaction or nested writes
   return await prisma.product.create({
     data: {
       name: productData.name,
@@ -12,8 +11,14 @@ export async function createProduct(productData: any, variants: any[]) {
       description: productData.description,
       thumbnail: productData.thumbnail,
       status: productData.status || 'draft',
-      brand: { connect: { id: productData.brandId } },
-      category: { connect: { id: productData.categoryId } },
+      brand: { connect: { id: productData.brandId || productData.brand } },
+      category: { connect: { id: productData.categoryId || productData.category } },
+      specifications: {
+        create: (productData.specifications || []).map((spec: any) => ({
+          attributeId: spec.attributeId,
+          value: String(spec.value)
+        }))
+      },
       variants: {
         create: variants.map((vData) => ({
           sku: vData.sku || `SKU-${productData.name.substring(0, 3).toUpperCase()}-${uuidv4().substring(0, 8).toUpperCase()}`,

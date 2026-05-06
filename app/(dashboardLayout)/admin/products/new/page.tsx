@@ -26,10 +26,11 @@ export default function NewProduct() {
     category: '',
     description: '',
     thumbnail: '',
-    status: 'active'
+    status: 'active',
+    specifications: [] as { attributeId: string, value: string }[]
   });
 
-  const [selectedAttrs, setSelectedAttrs] = useState<string[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<any>(null);
   const [variants, setVariants] = useState<any[]>([]);
 
   useEffect(() => {
@@ -48,6 +49,24 @@ export default function NewProduct() {
     setBrands(await brandRes.json());
     setAttributes(await attrRes.json());
     setAllAttrValues(await valRes.json());
+  };
+
+  const handleCategoryChange = (catId: string) => {
+    const cat = categories.find(c => c.id === catId);
+    setSelectedCategory(cat);
+    setProduct({ ...product, category: catId, specifications: [] });
+    setVariants([]); // Clear variants when category changes to avoid mismatch
+  };
+
+  const updateSpec = (attrId: string, value: string) => {
+    const newSpecs = [...product.specifications];
+    const index = newSpecs.findIndex(s => s.attributeId === attrId);
+    if (index > -1) {
+      newSpecs[index].value = value;
+    } else {
+      newSpecs.push({ attributeId: attrId, value });
+    }
+    setProduct({ ...product, specifications: newSpecs });
   };
 
   const addVariant = () => {
@@ -92,6 +111,8 @@ export default function NewProduct() {
     }
   };
 
+  const categoryAttrs = selectedCategory?.categoryAttributes?.map((ca: any) => ca.attribute) || [];
+
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-8">
       <div className="flex justify-between items-center">
@@ -103,7 +124,7 @@ export default function NewProduct() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {/* Left Column: Basic Info */}
+        {/* Left Column: Basic Info & Specs */}
         <div className="md:col-span-2 space-y-6">
           <Card>
             <CardHeader>
@@ -132,7 +153,7 @@ export default function NewProduct() {
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Category</label>
-                  <Select onValueChange={(val) => setProduct({...product, category: val})}>
+                  <Select onValueChange={handleCategoryChange}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select Category" />
                     </SelectTrigger>
@@ -154,17 +175,52 @@ export default function NewProduct() {
             </CardContent>
           </Card>
 
+          {/* Dynamic Specifications */}
+          {categoryAttrs.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Specifications for {selectedCategory.name}</CardTitle>
+              </CardHeader>
+              <CardContent className="grid grid-cols-2 gap-4">
+                {categoryAttrs.map((attr: any) => (
+                  <div key={attr.id} className="space-y-2">
+                    <label className="text-sm font-medium">{attr.name}</label>
+                    {attr.type === 'select' ? (
+                       <Select onValueChange={(val) => updateSpec(attr.id, val)}>
+                          <SelectTrigger>
+                            <SelectValue placeholder={`Select ${attr.name}`} />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {allAttrValues
+                              .filter(v => v.attributeId === attr.id)
+                              .map(v => <SelectItem key={v.id} value={v.value}>{v.value}</SelectItem>)
+                            }
+                          </SelectContent>
+                       </Select>
+                    ) : (
+                      <Input 
+                        type={attr.type === 'number' ? 'number' : 'text'}
+                        placeholder={`Enter ${attr.name}`}
+                        onChange={(e) => updateSpec(attr.id, e.target.value)}
+                      />
+                    )}
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          )}
+
           {/* Variants Section */}
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>Variants</CardTitle>
-              <Button variant="outline" size="sm" onClick={addVariant}>
+              <Button variant="outline" size="sm" onClick={addVariant} disabled={!product.category}>
                 <Plus className="w-4 h-4 mr-2" /> Add Variant
               </Button>
             </CardHeader>
             <CardContent className="space-y-4">
               {variants.map((variant, vIdx) => (
-                <div key={vIdx} className="p-4 border rounded-lg space-y-4 relative">
+                <div key={vIdx} className="p-4 border rounded-lg space-y-4 relative bg-white/50">
                   <Button 
                     variant="ghost" 
                     size="icon" 
@@ -194,9 +250,9 @@ export default function NewProduct() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">SKU (Auto-gen if empty)</label>
+                      <label className="text-sm font-medium">SKU</label>
                       <Input 
-                        placeholder="SKU-..."
+                        placeholder="Auto-generated if empty"
                         value={variant.sku}
                         onChange={(e) => updateVariant(vIdx, 'sku', e.target.value)}
                       />
@@ -205,26 +261,28 @@ export default function NewProduct() {
 
                   {/* Attribute Selector for Variant */}
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Attributes (e.g. 8GB, Blue)</label>
-                    <div className="flex flex-wrap gap-2">
-                      {attributes.map(attr => (
+                    <label className="text-sm font-medium">Variant Attributes</label>
+                    <div className="flex flex-wrap gap-4">
+                      {categoryAttrs
+                        .filter((attr: any) => attr.type === 'select')
+                        .map((attr: any) => (
                         <div key={attr.id} className="space-y-1">
                           <span className="text-xs text-muted-foreground">{attr.name}</span>
                           <Select 
                             onValueChange={(val) => {
                               const otherAttrs = variant.attributeValues.filter((vId: string) => {
                                 const valObj = allAttrValues.find(av => av.id === vId);
-                                return valObj?.attribute.id !== attr.id;
+                                return valObj?.attributeId !== attr.id;
                               });
                               updateVariant(vIdx, 'attributeValues', [...otherAttrs, val]);
                             }}
                           >
-                            <SelectTrigger className="w-[120px]">
+                            <SelectTrigger className="w-[150px]">
                               <SelectValue placeholder="Choose" />
                             </SelectTrigger>
                             <SelectContent>
                               {allAttrValues
-                                .filter(val => val.attribute.id === attr.id)
+                                .filter(val => val.attributeId === attr.id)
                                 .map(val => <SelectItem key={val.id} value={val.id}>{val.value}</SelectItem>)
                               }
                             </SelectContent>
@@ -237,7 +295,7 @@ export default function NewProduct() {
               ))}
               {variants.length === 0 && (
                 <div className="text-center py-8 text-muted-foreground border-2 border-dashed rounded-lg">
-                  No variants added. Click "Add Variant" to start.
+                  {product.category ? 'No variants added. Click "Add Variant" to start.' : 'Please select a category first.'}
                 </div>
               )}
             </CardContent>
@@ -248,7 +306,7 @@ export default function NewProduct() {
         <div className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Organization</CardTitle>
+              <CardTitle>Media & Status</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
