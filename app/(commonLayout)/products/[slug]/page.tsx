@@ -1,20 +1,39 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation'; // useRouter যোগ করা হয়েছে
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import Image from 'next/image';
-import { Star, ShoppingCart, ShieldCheck, Truck, Check, Loader2 } from 'lucide-react';
+import { Star, ShoppingCart, Loader2, ShoppingBag } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 
-export default function ProductDetailsPage({ params }: { params: { slug: string } }) {
+// --- Success Notification Component ---
+const AddToCartSuccess = ({ name, image }: { name: string; image: string }) => (
+  <div className="flex items-center gap-4 p-2 w-full">
+    <div className="relative h-12 w-12 flex-shrink-0">
+      <Image
+        src={image}
+        alt={name}
+        fill
+        className="object-cover rounded-lg border border-gray-100"
+      />
+    </div>
+    <div className="flex flex-col">
+      <p className="text-sm font-bold text-gray-900">কার্টে যোগ করা হয়েছে!</p>
+      <p className="text-xs text-gray-500 line-clamp-1">{name}</p>
+    </div>
+  </div>
+);
+
+export default function ProductDetailsPage({ params }: any) {
+  const router = useRouter(); // Router initialize
   const [product, setProduct] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [selectedVariant, setSelectedVariant] = useState<any>(null);
-  const [selectedAttrValues, setSelectedAttrValues] = useState<Record<string, string>>({});
 
   useEffect(() => {
     fetchProduct();
@@ -22,200 +41,173 @@ export default function ProductDetailsPage({ params }: { params: { slug: string 
 
   const fetchProduct = async () => {
     try {
-      // Find product by slug - for now using a search param or similar
-      // In a real app, you'd have an API that finds by slug
-      // For this demo, let's assume we can fetch by slug or use the ID if we had it
-      // Let's fetch all products and find the one with the slug
-      const res = await fetch(`/api/products`);
+      const res = await fetch('/api/products');
       const data = await res.json();
       const found = data.products.find((p: any) => p.slug === params.slug);
-      
+
       if (found) {
         const fullRes = await fetch(`/api/products/${found.id}`);
-        const fullProduct = await fullRes.json();
-        setProduct(fullProduct);
-        
-        // Default to first variant
-        if (fullProduct.variants?.length > 0) {
-          setSelectedVariant(fullProduct.variants[0]);
-          
-          // Initialize selected attributes from first variant
-          const initialAttrs: Record<string, string> = {};
-          fullProduct.variants[0].variantAttributes.forEach((va: any) => {
-            initialAttrs[va.attributeValue.attribute.name] = va.attributeValue.id;
-          });
-          setSelectedAttrValues(initialAttrs);
+        const full = await fullRes.json();
+        setProduct(full);
+        if (full.variants?.length) {
+          setSelectedVariant(full.variants[0]);
         }
       }
-    } catch (error) {
-      toast.error('Failed to load product');
+    } catch (err) {
+      toast.error('Product load করতে সমস্যা হয়েছে');
     } finally {
       setLoading(false);
     }
   };
 
-  // Find variant based on selected attributes
-  useEffect(() => {
+  // 🛒 ADD TO CART FUNCTION
+  const addToCart = () => {
     if (!product) return;
-
-    const variant = product.variants.find((v: any) => {
-      return v.variantAttributes.every((va: any) => {
-        return selectedAttrValues[va.attributeValue.attribute.name] === va.attributeValue.id;
+    try {
+      const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+      const item = {
+        id: product.id || product._id,
+        name: product.name,
+        price: selectedVariant?.price || product.price,
+        image: product.thumbnail,
+        sku: selectedVariant?.sku || product.sku,
+        qty: 1
+      };
+      const existingItemIndex = cart.findIndex((i: any) => i.id === item.id && i.sku === item.sku);
+      if (existingItemIndex > -1) {
+        cart[existingItemIndex].qty += 1;
+      } else {
+        cart.push(item);
+      }
+      localStorage.setItem('cart', JSON.stringify(cart));
+      window.dispatchEvent(new Event('storage')); 
+      toast(<AddToCartSuccess name={product.name} image={product.thumbnail} />, {
+        duration: 3000,
+        className: "rounded-2xl border-none shadow-2xl bg-white p-4",
       });
-    });
-
-    if (variant) {
-      setSelectedVariant(variant);
+    } catch (error) {
+      toast.error('কার্টে অ্যাড করা যায়নি');
     }
-  }, [selectedAttrValues, product]);
-
-  const handleAttrChange = (attrName: string, valueId: string) => {
-    setSelectedAttrValues(prev => ({
-      ...prev,
-      [attrName]: valueId
-    }));
   };
 
-  if (loading) return <div className="flex items-center justify-center min-h-screen"><Loader2 className="animate-spin w-12 h-12" /></div>;
-  if (!product) return <div className="text-center py-20">Product not found</div>;
+  // 🚀 BUY NOW FUNCTION (DIRECT CHECKOUT)
+  const handleBuyNow = () => {
+    if (!product) return;
+    
+    const item = {
+      id: product.id || product._id,
+      name: product.name,
+      price: selectedVariant?.price || product.price,
+      image: product.thumbnail,
+      sku: selectedVariant?.sku || product.sku,
+      qty: 1
+    };
 
-  // Extract all unique attributes and their values across all variants
-  const availableAttrs: Record<string, any[]> = {};
-  product.variants.forEach((v: any) => {
-    v.variantAttributes.forEach((va: any) => {
-      const a = va.attributeValue;
-      if (!availableAttrs[a.attribute.name]) {
-        availableAttrs[a.attribute.name] = [];
-      }
-      if (!availableAttrs[a.attribute.name].find(val => val.id === a.id)) {
-        availableAttrs[a.attribute.name].push(a);
-      }
-    });
-  });
+    // সরাসরি লোকাল স্টোরেজে এই আইটেমটি সেট করে চেকআউট পেজে পাঠানো
+    // এটি করলে আগের কার্ট ক্লিয়ার হয়ে যাবে, যা "Buy Now" এর জন্য স্ট্যান্ডার্ড
+    localStorage.setItem('cart', JSON.stringify([item]));
+    window.dispatchEvent(new Event('storage')); 
+    router.push('/checkout');
+  };
+
+  if (loading) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-white">
+        <Loader2 className="animate-spin w-10 h-10 text-gray-400" />
+      </div>
+    );
+  }
+
+  if (!product) return <div className="text-center py-20 font-bold">Product not found</div>;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[#F8F9FA] text-black">
       <Navbar />
-      
-      <main className="container mx-auto px-4 py-10">
-        <div className="flex flex-col lg:flex-row gap-12 mb-16">
-          {/* Image Section */}
-          <div className="w-full lg:w-1/2">
-            <div className="relative aspect-square rounded-[2.5rem] overflow-hidden glass shadow-2xl group">
-              <Image 
-                src={selectedVariant?.image || product.thumbnail || 'https://images.unsplash.com/photo-1591405351990-4726e33df48c?w=400&h=400&fit=crop'} 
-                alt={product.name} 
-                fill 
-                className="object-cover transition-transform duration-700 group-hover:scale-105"
-              />
-              <Badge className="absolute top-6 right-6 px-4 py-1.5 text-sm tech-gradient border-none">
-                {product.category?.name}
-              </Badge>
-            </div>
+
+      <main className="max-w-6xl mx-auto px-4 py-12">
+        <div className="grid md:grid-cols-2 gap-12 bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
+          
+          {/* IMAGE SECTION */}
+          <div className="bg-gray-50 rounded-2xl overflow-hidden border border-gray-100 p-6 flex items-center justify-center">
+            <Image
+              src={product.thumbnail}
+              alt={product.name}
+              width={600}
+              height={600}
+              className="w-full h-[450px] object-contain mix-blend-multiply"
+            />
           </div>
 
-          {/* Info Section */}
-          <div className="w-full lg:w-1/2 space-y-8">
-            <div className="space-y-4">
-              <div className="flex items-center gap-1 text-yellow-500">
-                {[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4 fill-current" />)}
-                <span className="ml-2 text-sm font-bold text-foreground">(4.5)</span>
-                <span className="mx-2 text-muted-foreground">|</span>
-                <span className="text-sm text-primary font-medium">12 Reviews</span>
+          {/* INFO SECTION */}
+          <div className="flex flex-col justify-center">
+            <Badge variant="secondary" className="w-fit bg-blue-50 text-blue-600 border-none px-3 py-1 mb-4">
+              {product.brand?.name || 'Premium Quality'}
+            </Badge>
+            
+            <h1 className="text-4xl font-extrabold tracking-tight mb-4 leading-tight">
+              {product.name}
+            </h1>
+
+            <div className="flex items-center gap-3 mb-6">
+              <div className="flex text-yellow-400">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} size={18} fill={i < Math.floor(product.rating) ? "currentColor" : "none"} className={i < Math.floor(product.rating) ? "" : "text-gray-300"} />
+                ))}
               </div>
-              
-              <h1 className="text-4xl font-black tracking-tight text-secondary dark:text-white leading-tight">
-                {product.name}
-              </h1>
-              
-              <div className="flex items-center gap-4">
-                <span className="text-4xl font-black text-primary">৳{selectedVariant?.price.toLocaleString()}</span>
-                {selectedVariant?.stock > 0 ? (
-                  <Badge className="bg-green-100 text-green-700 hover:bg-green-100 border-none px-3 font-bold">
-                    <Check className="w-3 h-3 mr-1" /> IN STOCK ({selectedVariant.stock})
-                  </Badge>
-                ) : (
-                  <Badge variant="destructive" className="px-3 font-bold">OUT OF STOCK</Badge>
-                )}
-              </div>
+              <span className="text-sm font-medium text-gray-500">({product.reviews} Reviews)</span>
             </div>
 
-            {/* Dynamic Attribute Selectors */}
-            <div className="space-y-6 border-y py-6">
-              {Object.keys(availableAttrs).map(attrName => (
-                <div key={attrName} className="space-y-3">
-                  <h3 className="font-bold text-sm uppercase tracking-wider text-muted-foreground">{attrName}</h3>
-                  <div className="flex flex-wrap gap-3">
-                    {availableAttrs[attrName].map(val => (
-                      <button
-                        key={val.id}
-                        onClick={() => handleAttrChange(attrName, val.id)}
-                        className={`px-4 py-2 rounded-xl border-2 font-bold transition-all ${
-                          selectedAttrValues[attrName] === val.id 
-                          ? 'border-primary bg-primary/10 text-primary' 
-                          : 'border-transparent bg-muted hover:bg-muted/80'
-                        }`}
-                      >
-                        {val.value}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              ))}
+            <p className="text-gray-600 mb-8 text-lg">{product.shortDescription}</p>
+
+            <div className="mb-8">
+              <span className="text-sm text-gray-400 uppercase font-bold tracking-widest block mb-1">Price</span>
+              <div className="text-4xl font-black">৳{(selectedVariant?.price || product.price).toLocaleString()}</div>
             </div>
 
-            <p className="text-lg text-muted-foreground leading-relaxed">
-              {product.description}
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-4 pt-4">
-              <Button 
-                size="lg" 
-                className="flex-1 tech-gradient h-14 text-lg font-bold shadow-lg shadow-primary/20"
-                disabled={!selectedVariant || selectedVariant.stock === 0}
+            {/* ACTION BUTTONS */}
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Button
+                onClick={addToCart}
+                variant="outline"
+                className="flex-1 h-14 text-lg font-bold border-2 border-black hover:bg-black hover:text-white transition-all rounded-xl"
+                disabled={product.stock <= 0}
               >
-                <ShoppingCart className="w-5 h-5 mr-3" />
+                <ShoppingCart className="w-5 h-5 mr-2" />
                 Add to Cart
               </Button>
-              <Button size="lg" variant="outline" className="flex-1 h-14 text-lg font-bold border-2">
+
+              <Button
+                onClick={handleBuyNow} // Modal এর বদলে সরাসরি ফাংশন কল
+                className="flex-1 h-14 text-lg font-bold bg-black text-white hover:bg-gray-800 rounded-xl transition-all active:scale-95"
+                disabled={product.stock <= 0}
+              >
+                <ShoppingBag className="w-5 h-5 mr-2" />
                 Buy Now
               </Button>
             </div>
           </div>
         </div>
 
-        {/* Detailed Specs Tabs */}
-        <div className="glass rounded-[2rem] p-8 md:p-12 shadow-xl">
+        {/* DETAILS TABS */}
+        <div className="mt-12 bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
           <Tabs defaultValue="specs">
-            <TabsList className="bg-muted/50 p-1 rounded-xl mb-8">
-              <TabsTrigger value="specs" className="rounded-lg px-8 py-2.5 font-bold data-[state=active]:bg-background data-[state=active]:text-primary">
-                Specification
-              </TabsTrigger>
-              <TabsTrigger value="description" className="rounded-lg px-8 py-2.5 font-bold data-[state=active]:bg-background data-[state=active]:text-primary">
-                Description
-              </TabsTrigger>
+            <TabsList className="bg-gray-100 p-1 rounded-xl">
+              <TabsTrigger value="specs" className="px-8">Specifications</TabsTrigger>
+              <TabsTrigger value="desc" className="px-8">Description</TabsTrigger>
             </TabsList>
-            
-            <TabsContent value="specs" className="mt-0">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4">
-                {selectedVariant?.variantAttributes.map((va: any) => (
-                  <div key={va.id} className="flex justify-between border-b border-border py-4">
-                    <span className="text-muted-foreground font-medium">{va.attributeValue.attribute.name}</span>
-                    <span className="font-bold text-right">{va.attributeValue.value}</span>
+
+            <TabsContent value="specs" className="mt-8">
+              <div className="grid md:grid-cols-2 gap-x-12 gap-y-4">
+                {Object.entries(product.specifications || {}).map(([key, value]: any) => (
+                  <div key={key} className="flex justify-between border-b border-gray-50 py-4 px-2">
+                    <span className="text-gray-500 font-medium">{key}</span>
+                    <span className="font-bold text-gray-900">{value}</span>
                   </div>
                 ))}
-                <div className="flex justify-between border-b border-border py-4">
-                  <span className="text-muted-foreground font-medium">Brand</span>
-                  <span className="font-bold">{product.brand?.name}</span>
-                </div>
-                <div className="flex justify-between border-b border-border py-4">
-                  <span className="text-muted-foreground font-medium">SKU</span>
-                  <span className="font-bold">{selectedVariant?.sku}</span>
-                </div>
               </div>
             </TabsContent>
-            
-            <TabsContent value="description" className="text-muted-foreground leading-loose">
+
+            <TabsContent value="desc" className="mt-8 text-gray-600 leading-relaxed text-lg">
               {product.description}
             </TabsContent>
           </Tabs>

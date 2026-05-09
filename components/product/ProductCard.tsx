@@ -2,86 +2,64 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { Star, ShoppingCart, Plus } from 'lucide-react';
-import { Product } from '@/types';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface ProductCardProps {
   product: any;
-  onAddToCart?: (product: any) => void;
-  onSelect?: (product: any) => void;
-  actionType?: 'cart' | 'select';
 }
 
-export default function ProductCard({ product, onAddToCart, onSelect, actionType = 'cart' }: ProductCardProps) {
-  const displayPrice = product.variants?.[0]?.price || 0;
-  const inStock = product.variants?.some((v: any) => v.stock > 0);
+export default function ProductCard({ product }: ProductCardProps) {
+  const currentPrice = product.discountPrice || product.price;
+  const originalPrice = product.price;
+  const saveAmount = originalPrice - currentPrice;
+  const discountPercentage = Math.round((saveAmount / originalPrice) * 100);
 
   return (
-    <Card className="group overflow-hidden card-hover border-none shadow-md bg-card/50 backdrop-blur-sm">
+    <Card className="group relative overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 rounded-md bg-white">
+      {/* Discount Badge (Top Left) */}
+      {saveAmount > 0 && (
+        <div className="absolute top-2 left-0 z-10 bg-[#6b21a8] text-white text-[11px] px-2 py-1 rounded-r-full font-medium">
+          Save: {saveAmount.toLocaleString()}৳ (-{discountPercentage}%)
+        </div>
+      )}
+
+      {/* Product Image */}
       <Link href={`/products/${product.slug}`}>
-        <div className="relative aspect-[5/4] overflow-hidden bg-muted">
+        <div className="relative aspect-square p-4 flex items-center justify-center bg-white">
           <Image
-            src={product.thumbnail || 'https://images.unsplash.com/photo-1591405351990-4726e33df48c?w=400&h=400&fit=crop'}
+            src={product.thumbnail}
             alt={product.name}
-            fill
-            className="object-cover transition-transform duration-500 group-hover:scale-110"
+            width={250}
+            height={250}
+            className="object-contain transition-transform duration-300 group-hover:scale-105"
           />
-          <Badge className="absolute top-2 right-2 glass text-foreground font-medium">
-            {product.category?.name || 'Gadget'}
-          </Badge>
-          {!inStock && (
-            <div className="absolute inset-0 bg-background/60 flex items-center justify-center backdrop-blur-[2px]">
-              <Badge variant="destructive" className="px-4 py-1 text-sm">Out of Stock</Badge>
-            </div>
-          )}
         </div>
       </Link>
-      
-      <CardHeader className="p-3 pb-0">
-        <div className="flex items-center gap-1 text-yellow-500 mb-1">
-          <Star className="w-3 h-3 fill-current" />
-          <span className="text-[10px] font-bold">4.5</span>
-        </div>
+
+      {/* Product Details */}
+      <CardHeader className="p-4 pt-2 text-center">
         <Link href={`/products/${product.slug}`}>
-          <CardTitle className="text-sm font-bold line-clamp-2 group-hover:text-primary transition-colors leading-tight">
+          <CardTitle className="text-[15px] font-medium text-gray-800 line-clamp-2 hover:text-red-600 transition-colors">
             {product.name}
           </CardTitle>
         </Link>
       </CardHeader>
 
-      <CardContent className="p-3 pt-2">
-        <div className="text-base font-black text-primary">
-          ৳{displayPrice.toLocaleString()}
+      <CardContent className="p-4 pt-0 text-center">
+        <div className="flex items-center justify-center gap-3">
+          {/* Current Price */}
+          <span className="text-xl font-bold text-[#d32f2f]">
+            {currentPrice.toLocaleString()}৳
+          </span>
+          
+          {/* Original Price */}
+          {saveAmount > 0 && (
+            <span className="text-sm text-gray-400 line-through">
+              {originalPrice.toLocaleString()}৳
+            </span>
+          )}
         </div>
-        <p className="text-[10px] text-muted-foreground mt-1 line-clamp-1">
-          {product.brand?.name}
-        </p>
       </CardContent>
-
-      <CardFooter className="p-3 pt-0">
-        {actionType === 'cart' ? (
-          <Button 
-            className="w-full h-9 gap-2 bg-secondary hover:bg-secondary/90 text-white font-bold text-xs transition-all" 
-            onClick={() => onAddToCart?.(product)}
-            disabled={!inStock}
-          >
-            <ShoppingCart className="w-3.5 h-3.5" />
-            Add to Cart
-          </Button>
-        ) : (
-          <Button 
-            className="w-full h-9 gap-2 bg-primary hover:bg-primary/90 text-white font-bold text-xs transition-all" 
-            onClick={() => onSelect?.(product)}
-            disabled={!inStock}
-          >
-            <Plus className="w-3.5 h-3.5" />
-            Select
-          </Button>
-        )}
-      </CardFooter>
     </Card>
   );
 }

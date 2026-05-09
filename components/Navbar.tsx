@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react'; // useEffect যোগ করা হয়েছে কার্ট চেক করার জন্য
 import Link from 'next/link';
 import { 
   Search, 
@@ -12,7 +12,8 @@ import {
   X,
   ShoppingCart,
   LogOut,
-  ChevronDown
+  ChevronDown,
+  ShoppingBag
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -32,14 +33,26 @@ const categories = [
   "Server & Storage", "Accessories", "Gadget", "Gaming", "TV", "Appliance"
 ];
 
-export default function Navbar({ cartCount = 0 }: { cartCount?: number }) {
+export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [cartCount, setCartCount] = useState(0); // কার্ট কাউন্ট স্টেট
 
-  // useSession() হুক দিয়ে কারেন্ট ইউজারের সেশন ডাটা নেওয়া হচ্ছে
   const { data, isPending } = useSession();
   const user = data?.user;
 
-  // লগআউট হ্যান্ডলার
+  // কার্ট ডাটা লোড এবং সিঙ্ক করার জন্য ইফেক্ট
+  useEffect(() => {
+    const updateCartCount = () => {
+      const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+      const totalItems = cart.reduce((acc: number, item: any) => acc + (item.qty || 1), 0);
+      setCartCount(totalItems);
+    };
+
+    updateCartCount();
+    window.addEventListener('storage', updateCartCount);
+    return () => window.removeEventListener('storage', updateCartCount);
+  }, []);
+
   const handleLogout = async () => {
     await signOut({
       fetchOptions: {
@@ -50,7 +63,6 @@ export default function Navbar({ cartCount = 0 }: { cartCount?: number }) {
     });
   };
 
-  // নামের প্রথম অক্ষর বের করার ফাংশন (অবতারের জন্য)
   const getInitials = (name: string) => {
     return name ? name.charAt(0).toUpperCase() : 'U';
   };
@@ -87,6 +99,23 @@ export default function Navbar({ cartCount = 0 }: { cartCount?: number }) {
 
           {/* Action Items */}
           <div className="hidden lg:flex items-center space-x-6 whitespace-nowrap text-white">
+            
+            {/* --- Professional Cart Button (Desktop) --- */}
+            <Link href="/cart" className="flex items-center gap-3 group relative">
+              <div className="p-2 rounded-full bg-white/5 group-hover:bg-primary/20 transition-all duration-300 text-primary">
+                <ShoppingBag className="w-6 h-6" />
+                {cartCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-primary text-white text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center border-2 border-[#081621] animate-in zoom-in duration-300">
+                    {cartCount}
+                  </span>
+                )}
+              </div>
+              <div className="hidden xl:block">
+                <p className="text-sm font-bold leading-tight group-hover:text-primary transition-colors">My Cart</p>
+                <p className="text-[10px] text-gray-400">View Items</p>
+              </div>
+            </Link>
+
             <Link href="/offers" className="flex items-center gap-3 group">
               <div className="p-2 rounded-full bg-white/5 group-hover:bg-primary/20 transition-colors">
                 <Gift className="w-6 h-6 text-primary" />
@@ -107,9 +136,7 @@ export default function Navbar({ cartCount = 0 }: { cartCount?: number }) {
               </div>
             </Link>
             
-            {/* ========================================== */}
-            {/* DYNAMIC USER SECTION (DESKTOP)             */}
-            {/* ========================================== */}
+            {/* DYNAMIC USER SECTION */}
             {isPending ? (
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-white/10 animate-pulse" />
@@ -119,11 +146,9 @@ export default function Navbar({ cartCount = 0 }: { cartCount?: number }) {
                 </div>
               </div>
             ) : user ? (
-              /* logged in state */
               <DropdownMenu>
                 <DropdownMenuTrigger className="outline-none">
                   <div className="flex items-center gap-3 group cursor-pointer">
-                    {/* User Profile Avatar with Fallback */}
                     <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-[#ef4a23] p-[2px] shadow-lg">
                       <div className="w-full h-full rounded-full bg-[#081621] flex items-center justify-center overflow-hidden">
                         {user.image ? (
@@ -136,7 +161,6 @@ export default function Navbar({ cartCount = 0 }: { cartCount?: number }) {
                       </div>
                     </div>
                     <div className="hidden xl:block text-left max-w-[120px]">
-                      {/* Truncated Name & Email to avoid design breaking */}
                       <p className="text-sm font-bold leading-tight text-white group-hover:text-primary transition-colors truncate">
                         {user.name}
                       </p>
@@ -170,7 +194,6 @@ export default function Navbar({ cartCount = 0 }: { cartCount?: number }) {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              /* logged out state */
               <Link href="/account/login" className="flex items-center gap-3 group">
                 <div className="p-2 rounded-full bg-white/5 group-hover:bg-primary/20 transition-colors text-primary">
                   <User className="w-6 h-6" />
@@ -197,11 +220,19 @@ export default function Navbar({ cartCount = 0 }: { cartCount?: number }) {
                 Builder
               </Button>
             </Link>
-            <Link href="/cart">
+            
+            {/* --- Cart Button (Mobile) --- */}
+            <Link href="/cart" className="relative">
               <Button variant="ghost" size="icon" className="text-white hover:bg-white/5">
-                <ShoppingCart className="w-6 h-6" />
+                <ShoppingBag className="w-6 h-6" />
+                {cartCount > 0 && (
+                  <span className="absolute top-0 right-0 bg-primary text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center border border-[#081621]">
+                    {cartCount}
+                  </span>
+                )}
               </Button>
             </Link>
+
             <button className="text-white p-2 hover:bg-white/5 rounded-lg" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
               {isMobileMenuOpen ? <X className="w-7 h-7" /> : <Menu className="w-7 h-7" />}
             </button>
@@ -239,19 +270,26 @@ export default function Navbar({ cartCount = 0 }: { cartCount?: number }) {
               <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-6 h-6 text-white/40" />
             </div>
             
-            {/* ========================================== */}
-            {/* DYNAMIC USER SECTION (MOBILE)              */}
-            {/* ========================================== */}
             <div className="grid grid-cols-2 gap-4">
+              {/* Cart for Mobile Menu */}
+              <Link href="/cart" className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-white/5 relative" onClick={() => setIsMobileMenuOpen(false)}>
+                <ShoppingBag className="w-8 h-8 text-primary" />
+                <span className="font-bold">My Cart</span>
+                {cartCount > 0 && (
+                  <span className="absolute top-3 right-10 bg-primary text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                    {cartCount}
+                  </span>
+                )}
+              </Link>
+
               <Link href="/offers" className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-white/5">
                 <Gift className="w-8 h-8 text-primary" />
                 <span className="font-bold">Offers</span>
               </Link>
 
               {user ? (
-                /* logged in state (mobile) */
                 <DropdownMenu>
-                  <DropdownMenuTrigger className="outline-none">
+                  <DropdownMenuTrigger className="outline-none w-full">
                     <div className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-white/5 w-full h-full cursor-pointer">
                       <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-[#ef4a23] p-[2px]">
                         <div className="w-full h-full rounded-full bg-[#081621] flex items-center justify-center overflow-hidden">
@@ -289,7 +327,6 @@ export default function Navbar({ cartCount = 0 }: { cartCount?: number }) {
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
-                /* logged out state (mobile) */
                 <Link href="/account/login" className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-white/5" onClick={() => setIsMobileMenuOpen(false)}>
                   <User className="w-8 h-8 text-primary" />
                   <span className="font-bold">Profile</span>

@@ -35,6 +35,6 @@ export const auth = betterAuth({
     provider: "mongodb",
   }),
   emailAndPassword: {
-    enabled: true, // Better Auth এখন নিজেই অত্যন্ত সিকিউরভাবে পাসওয়ার্ড হ্যাশ করে ডাটাবেজে পাঠাবে
+    enabled: true, 
   },
 });

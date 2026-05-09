@@ -51,6 +51,7 @@ export async function createProduct(productData: any, variants: any[]) {
   });
 }
 
+// get all products
 export async function getProducts(filters: any = {}, pagination: any = { page: 1, limit: 10 }) {
   const { categoryId, brandId, search } = filters;
   const skip = (pagination.page - 1) * pagination.limit;
@@ -83,6 +84,7 @@ export async function getProducts(filters: any = {}, pagination: any = { page: 1
   };
 }
 
+// specefic product search
 export async function getProductById(id: string) {
   return await prisma.product.findUnique({
     where: { id },

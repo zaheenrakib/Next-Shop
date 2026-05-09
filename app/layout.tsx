@@ -17,7 +17,12 @@ export default function RootLayout({
       <body className="antialiased">
         {children}
         {/* <Toaster position="top-right" richColors /> */}
+        <Toaster position="bottom-right" richColors />
+
       </body>
     </html>
   );
 }
+
+
+

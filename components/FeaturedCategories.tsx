@@ -1,23 +1,23 @@
 'use client';
 
 import React from 'react';
-import { 
-  Wifi, 
-  Waves, 
-  Plane, 
-  Aperture, 
-  Tablet, 
-  Tv, 
-  Smartphone, 
-  Usb, 
-  HardDrive, 
-  Video, 
-  Scissors, 
-  Watch, 
-  Camera, 
-  Headphones, 
-  Speaker, 
-  Gamepad2 
+import {
+  Wifi,
+  Waves,
+  Plane,
+  Aperture,
+  Tablet,
+  Tv,
+  Smartphone,
+  Usb,
+  HardDrive,
+  Video,
+  Scissors,
+  Watch,
+  Camera,
+  Headphones,
+  Speaker,
+  Gamepad2
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -51,8 +51,8 @@ export default function FeaturedCategories() {
 
         <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4">
           {categories.map((cat, idx) => (
-            <Link 
-              key={idx} 
+            <Link
+              key={idx}
               href={`/products?category=${encodeURIComponent(cat.name)}`}
               className="group bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col items-center justify-center gap-4 transition-all duration-300 hover:shadow-md hover:border-primary/20 hover:-translate-y-1"
             >

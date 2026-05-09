@@ -1,161 +1,276 @@
 'use client';
 
-import { useCart } from '@/hooks/useCart';
-import { CartItem } from '@/types';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Separator } from '@/components/ui/separator';
+import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { ShoppingBag, CreditCard, Truck, CheckCircle2 } from 'lucide-react';
-import { useState } from 'react';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Truck, Loader2, CreditCard, Wallet } from 'lucide-react';
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
 import { toast } from 'sonner';
-import { useRouter } from 'next/navigation';
+
+const districts = [
+  "Dhaka", "Faridpur", "Gazipur", "Gopalganj", "Kishoreganj", "Madaripur", "Manikganj", "Munshiganj", "Narayanganj", "Narsingdi", "Rajbari", "Shariatpur", "Tangail",
+  "Bagerhat", "Chuadanga", "Jessore", "Jhenaidah", "Khulna", "Kushtia", "Magura", "Meherpur", "Narail", "Satkhira",
+  "Bogra", "Joypurhat", "Naogaon", "Natore", "Chapainawabganj", "Pabna", "Rajshahi", "Sirajganj",
+  "Dinajpur", "Gaibandha", "Kurigram", "Lalmonirhat", "Nilphamari", "Panchagarh", "Rangpur", "Thakurgaon",
+  "Barguna", "Barisal", "Bhola", "Jhalokati", "Patuakhali", "Pirojpur",
+  "Habiganj", "Moulvibazar", "Sunamganj", "Sylhet",
+  "Bandarban", "Brahmanbaria", "Chandpur", "Chittagong", "Comilla", "Cox's Bazar", "Feni", "Khagrachhari", "Lakshmipur", "Noakhali", "Rangamati"
+].sort();
 
 export default function CheckoutPage() {
-  const { items, getTotalPrice, clearCart } = useCart();
-  const totalPrice = getTotalPrice();
-  const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const [cart, setCart] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  const handleCheckout = (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    
-    // Simulate API call
-    setTimeout(() => {
-      setLoading(false);
-      toast.success('Order placed successfully!', {
-        description: 'Thank you for shopping with NextBazaar.',
-      });
-      clearCart();
-      router.push('/');
-    }, 2000);
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    address: '',
+    upazila: '',
+    district: 'Dhaka',
+    mobile: '',
+    email: '',
+    comment: '',
+    paymentMethod: 'online'
+  });
+
+  useEffect(() => {
+    const savedCart = localStorage.getItem('cart');
+    if (!savedCart || JSON.parse(savedCart).length === 0) {
+      router.push('/cart');
+      return;
+    }
+    setCart(JSON.parse(savedCart));
+  }, [router]);
+
+  const shippingFee = formData.district === "Dhaka" ? 250 : 900;
+  const subtotal = cart.reduce((sum, item) => sum + (item.price * (item.qty || item.quantity || 1)), 0);
+  const total = subtotal + shippingFee;
+
+  const handleInputChange = (e: any) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  if (items.length === 0) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Navbar />
-        <div className="container mx-auto px-4 py-40 text-center">
-          <ShoppingBag className="w-16 h-16 mx-auto mb-6 text-muted-foreground" />
-          <h1 className="text-3xl font-bold">Your cart is empty</h1>
-          <Button className="mt-6 tech-gradient" onClick={() => router.push('/products')}>Start Shopping</Button>
-        </div>
-      </div>
-    );
-  }
+  const handleConfirmOrder = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!formData.firstName || !formData.address || !formData.mobile || !formData.email) {
+      toast.error('অনুগ্রহ করে সব তারকা চিহ্নিত (*) তথ্য প্রদান করুন');
+      return;
+    }
+
+    setLoading(true);
+
+    const orderDetails = {
+      orderId: `ORDER-${Date.now()}`,
+      customerInfo: {
+        name: `${formData.firstName} ${formData.lastName}`,
+        email: formData.email,
+        phone: formData.mobile,
+        fullAddress: `${formData.address}, ${formData.upazila}, ${formData.district}`,
+        comment: formData.comment
+      },
+      paymentInfo: {
+        method: formData.paymentMethod,
+        subtotal: subtotal,
+        shipping: shippingFee,
+        totalAmount: total
+      },
+      orderItems: cart.map(item => ({
+        id: item.id,
+        name: item.name,
+        qty: item.qty || 1,
+        unitPrice: item.price,
+        lineTotal: item.price * (item.qty || 1)
+      }))
+    };
+
+    try {
+      if (formData.paymentMethod === 'online') {
+        const response = await fetch('/api/sslcommerz/init', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(orderDetails),
+        });
+        const data = await response.json();
+        if (data.url) window.location.replace(data.url);
+      } else {
+        const response = await fetch('/api/orders', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(orderDetails),
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          toast.success('অর্ডারটি সফলভাবে গ্রহণ করা হয়েছে (COD)');
+          localStorage.removeItem('cart');
+          router.push('/order-success');
+        } else {
+          toast.error('অর্ডার সেভ করতে সমস্যা হয়েছে');
+        }
+      }
+    } catch (error) {
+      toast.error('অর্ডার প্রক্রিয়াকরণে সমস্যা হয়েছে');
+      console.error("Order Error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar cartCount={items.length} />
-      
-      <main className="container mx-auto px-4 py-10">
-        <h1 className="text-4xl font-black mb-10 tracking-tight">Checkout</h1>
-        
-        <div className="flex flex-col lg:flex-row gap-12">
-          {/* Shipping Form */}
-          <div className="lg:w-2/3">
-            <div className="glass p-8 rounded-3xl space-y-8">
-              <div className="flex items-center gap-3">
-                <Truck className="w-6 h-6 text-primary" />
-                <h2 className="text-2xl font-bold">Shipping Information</h2>
+    <div className="min-h-screen bg-slate-50">
+      <Navbar />
+      <div className="container mx-auto px-4 py-24 md:py-32">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+          {/* LEFT: FORM SECTION */}
+          <div className="lg:col-span-7 space-y-6">
+            <Card className="border-none shadow-sm rounded-xl bg-white overflow-hidden">
+              <div className="p-6 border-b flex items-center gap-2">
+                <Truck className="w-5 h-5 text-primary" />
+                <h2 className="text-xl font-bold text-slate-800">Shipping & Billing</h2>
               </div>
-              
-              <form onSubmit={handleCheckout} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="name">Full Name</Label>
-                    <Input id="name" required placeholder="John Doe" className="h-12 glass border-none" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email Address</Label>
-                    <Input id="email" type="email" required placeholder="john@example.com" className="h-12 glass border-none" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="phone">Phone Number</Label>
-                    <Input id="phone" required placeholder="+880 1XXX XXXXXX" className="h-12 glass border-none" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="city">City</Label>
-                    <Input id="city" required placeholder="Dhaka" className="h-12 glass border-none" />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="address">Full Address</Label>
-                  <Input id="address" required placeholder="House #, Road #, Area" className="h-12 glass border-none" />
-                </div>
-
-                <div className="pt-6 space-y-4">
-                  <div className="flex items-center gap-3 mb-4">
-                    <CreditCard className="w-6 h-6 text-primary" />
-                    <h2 className="text-2xl font-bold">Payment Method</h2>
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    {['Cash on Delivery', 'Stripe / Card', 'bKash / MFS'].map((method) => (
-                      <div key={method} className="relative group cursor-pointer">
-                        <input type="radio" name="payment" value={method} className="peer absolute inset-0 opacity-0 cursor-pointer" defaultChecked={method === 'Cash on Delivery'} />
-                        <div className="p-4 rounded-xl glass border-2 border-transparent peer-checked:border-primary peer-checked:bg-primary/5 transition-all text-center font-bold">
-                          {method}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <Button type="submit" size="lg" className="w-full h-14 text-lg font-bold tech-gradient mt-8" disabled={loading}>
-                  {loading ? 'Processing Order...' : `Confirm Order (৳${totalPrice.toLocaleString()})`}
-                </Button>
-              </form>
-            </div>
-          </div>
-
-          {/* Order Summary */}
-          <div className="lg:w-1/3">
-            <div className="glass p-8 rounded-3xl sticky top-28 space-y-6">
-              <h3 className="text-xl font-bold">Order Summary</h3>
-              <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
-                {items.map((item: CartItem) => (
-                  <div key={item.id} className="flex justify-between items-center gap-4">
-                    <div className="flex items-center gap-3">
-                      <div className="relative w-12 h-12 rounded-lg overflow-hidden border">
-                        <img src={item.images?.[0] || item.image || 'https://images.unsplash.com/photo-1591405351990-4726e33df48c?w=400&h=400&fit=crop'} alt={item.name} className="object-cover" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-bold line-clamp-1">{item.name}</p>
-                        <p className="text-xs text-muted-foreground">Qty: {item.quantity}</p>
-                      </div>
+              <CardContent className="p-8">
+                <form className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <Label className="font-bold">First Name*</Label>
+                      <Input name="firstName" placeholder="First Name*" className="h-12" onChange={handleInputChange} />
                     </div>
-                    <p className="font-bold whitespace-nowrap">৳{(item.price * item.quantity).toLocaleString()}</p>
+                    <div className="space-y-2">
+                      <Label className="font-bold">Last Name*</Label>
+                      <Input name="lastName" placeholder="Last Name*" className="h-12" onChange={handleInputChange} />
+                    </div>
                   </div>
-                ))}
-              </div>
-              <hr className="border-white/10" />
-              <div className="space-y-2">
-                <div className="flex justify-between text-muted-foreground">
-                  <span>Subtotal</span>
-                  <span>৳{totalPrice.toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between text-muted-foreground">
-                  <span>Shipping</span>
-                  <span className="text-green-500 font-bold">FREE</span>
-                </div>
-                <div className="flex justify-between text-xl font-black pt-4">
-                  <span>Total</span>
-                  <span className="text-primary">৳{totalPrice.toLocaleString()}</span>
-                </div>
-              </div>
-              
-              <div className="bg-primary/5 p-4 rounded-xl flex items-center gap-3">
-                <CheckCircle2 className="w-5 h-5 text-primary" />
-                <p className="text-[10px] text-muted-foreground">You are eligible for free shipping on this order!</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </main>
 
+                  <div className="space-y-2">
+                    <Label className="font-bold">Address*</Label>
+                    <Input name="address" placeholder="Address*" className="h-12" onChange={handleInputChange} />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <Label className="font-bold">Upazila/Thana*</Label>
+                      <Input name="upazila" placeholder="Upazila/Thana*" className="h-12" onChange={handleInputChange} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="font-bold">District*</Label>
+                      <select
+                        name="district"
+                        value={formData.district}
+                        className="w-full h-12 rounded-md border border-slate-200 px-3 bg-white focus:ring-2 focus:ring-primary outline-none transition-all font-medium"
+                        onChange={handleInputChange}
+                      >
+                        {districts.map(d => <option key={d} value={d}>{d}</option>)}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <Label className="font-bold">Mobile*</Label>
+                      <Input name="mobile" placeholder="Telephone*" className="h-12" onChange={handleInputChange} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="font-bold">Email*</Label>
+                      <Input name="email" type="email" placeholder="E-Mail*" className="h-12" onChange={handleInputChange} />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="font-bold">Comment</Label>
+                    <Textarea name="comment" placeholder="Any special requirement/instruction for us?" className="min-h-[100px]" onChange={handleInputChange} />
+                  </div>
+
+                  <div className="pt-4 space-y-4">
+                    <Label className="font-bold text-lg">Payment Method</Label>
+                    <RadioGroup
+                      defaultValue="online"
+                      onValueChange={(val) => setFormData(p => ({ ...p, paymentMethod: val }))}
+                      className="grid grid-cols-1 md:grid-cols-2 gap-4"
+                    >
+                      <Label htmlFor="online" className={`flex items-center justify-between border p-4 rounded-xl cursor-pointer transition-all ${formData.paymentMethod === 'online' ? 'border-primary ring-1 ring-primary' : ''}`}>
+                        <div className="flex items-center gap-3">
+                          <RadioGroupItem value="online" id="online" />
+                          <span className="font-bold">Online Payment</span>
+                        </div>
+                        <CreditCard className="w-5 h-5 text-slate-400" />
+                      </Label>
+                      <Label htmlFor="cod" className={`flex items-center justify-between border p-4 rounded-xl cursor-pointer transition-all ${formData.paymentMethod === 'cod' ? 'border-primary ring-1 ring-primary' : ''}`}>
+                        <div className="flex items-center gap-3">
+                          <RadioGroupItem value="cod" id="cod" />
+                          <span className="font-bold">Cash on Delivery</span>
+                        </div>
+                        <Wallet className="w-5 h-5 text-slate-400" />
+                      </Label>
+                    </RadioGroup>
+                  </div>
+                </form>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* RIGHT: ORDER SUMMARY */}
+          <div className="lg:col-span-5">
+            <Card className="border-none shadow-sm rounded-xl bg-white overflow-hidden sticky top-28">
+              <div className="p-6 border-b bg-slate-50">
+                <h3 className="font-bold text-slate-800 flex items-center gap-2 uppercase">
+                  Order Summary
+                </h3>
+              </div>
+              <CardContent className="p-6 space-y-4">
+                <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2">
+                  {cart.map((item: any) => (
+                    <div key={item.id} className="flex justify-between items-center text-sm">
+                      <span className="text-slate-600 truncate max-w-[200px]">{item.name} x {item.qty || 1}</span>
+                      <span className="font-bold">৳{(item.price * (item.qty || 1)).toLocaleString()}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <Separator />
+
+                <div className="space-y-3">
+                  <div className="flex justify-between text-slate-600">
+                    <span>Sub-Total:</span>
+                    <span className="font-bold text-slate-900">৳{subtotal.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between text-slate-600">
+                    <span>Home Delivery:</span>
+                    <span className="font-bold text-slate-900">৳{shippingFee.toLocaleString()}</span>
+                  </div>
+                  <Separator />
+                  <div className="flex justify-between items-center pt-2">
+                    <span className="text-lg font-bold">Total:</span>
+                    <span className="text-2xl font-black text-primary">৳{total.toLocaleString()}</span>
+                  </div>
+                </div>
+
+                <div className="pt-6">
+                  <Button
+                    onClick={handleConfirmOrder}
+                    disabled={loading}
+                    className="w-full h-14 bg-[#3b49bb] hover:bg-[#2e3a9c] text-white text-lg font-bold rounded-md"
+                  >
+                    {loading ? <Loader2 className="animate-spin" /> : "Confirm Order"}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+        </div>
+      </div>
       <Footer />
     </div>
   );
