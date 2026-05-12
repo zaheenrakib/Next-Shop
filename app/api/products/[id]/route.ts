@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getProductById } from '@/services/productService';
+import { getProductById, updateProduct } from '@/services/productService';
 import prisma from '@/lib/prisma';
 
 export async function GET(req: Request, { params }: { params: { id: string } }) {
@@ -17,23 +17,31 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
 export async function PUT(req: Request, { params }: { params: { id: string } }) {
   try {
     const body = await req.json();
-    const product = await prisma.product.update({
-      where: { id: params.id },
-      data: body,
-    });
-    return NextResponse.json(product);
+    
+    // মডাল থেকে যেহেতু { product: ..., variants: ... } পাঠানো হচ্ছে
+    // তাই বডি থেকে product অংশটুকু আলাদা করে সার্ভিস ফাংশনে পাঠাতে হবে
+    const productData = body.product; 
+
+    if (!productData) {
+       return NextResponse.json({ error: "No product data provided" }, { status: 400 });
+    }
+
+    const updatedProduct = await updateProduct(params.id, productData);
+    return NextResponse.json(updatedProduct);
   } catch (error: any) {
+    console.error("Update Error:", error);
     return NextResponse.json({ error: error.message }, { status: 400 });
   }
 }
 
 export async function DELETE(req: Request, { params }: { params: { id: string } }) {
   try {
-    // Note: In a real app with constraints, you'd handle cascading deletes
-    // Prisma can handle this if configured in schema, or you do it manually
-    await prisma.product.delete({
-      where: { id: params.id }
-    });
+    // Cascade delete handling
+    await prisma.$transaction([
+      prisma.productSpecification.deleteMany({ where: { productId: params.id } }),
+      prisma.variant.deleteMany({ where: { productId: params.id } }),
+      prisma.product.delete({ where: { id: params.id } }),
+    ]);
     return NextResponse.json({ message: "Product deleted successfully" });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

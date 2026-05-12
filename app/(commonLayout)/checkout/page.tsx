@@ -13,6 +13,7 @@ import { Truck, Loader2, CreditCard, Wallet } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { toast } from 'sonner';
+import { useSession } from '@/lib/auth-client';
 
 const districts = [
   "Dhaka", "Faridpur", "Gazipur", "Gopalganj", "Kishoreganj", "Madaripur", "Manikganj", "Munshiganj", "Narayanganj", "Narsingdi", "Rajbari", "Shariatpur", "Tangail",
@@ -28,6 +29,9 @@ export default function CheckoutPage() {
   const router = useRouter();
   const [cart, setCart] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+
+  // useSession call
+  const session = useSession();
 
   const [formData, setFormData] = useState({
     firstName: '',
@@ -62,10 +66,17 @@ export default function CheckoutPage() {
   const handleConfirmOrder = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.firstName || !formData.address || !formData.mobile || !formData.email) {
-      toast.error('অনুগ্রহ করে সব তারকা চিহ্নিত (*) তথ্য প্রদান করুন');
-      return;
-    }
+    // Checking whether the user is logged in
+if (!session?.data?.user) {
+  toast.error('Please log in first to confirm the order');
+  router.push('/account/register');
+  return;
+}
+
+if (!formData.firstName || !formData.address || !formData.mobile || !formData.email) {
+  toast.error('Please provide all required (*) information');
+  return;
+}
 
     setLoading(true);
 
@@ -126,6 +137,7 @@ export default function CheckoutPage() {
       setLoading(false);
     }
   };
+  
 
   return (
     <div className="min-h-screen bg-slate-50">

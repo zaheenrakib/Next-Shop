@@ -28,7 +28,7 @@ const categories = [
   { name: 'Gimbal', icon: Aperture },
   { name: 'Table PC', icon: Tablet },
   { name: 'TV', icon: Tv },
-  { name: 'Mobile Phone', icon: Smartphone },
+  { name: 'Mobile', icon: Smartphone },
   { name: 'Mobile Accessories', icon: Usb },
   { name: 'Portable SSD', icon: HardDrive },
   { name: 'WiFi Camera', icon: Video },
@@ -53,7 +53,7 @@ export default function FeaturedCategories() {
           {categories.map((cat, idx) => (
             <Link
               key={idx}
-              href={`/products?category=${encodeURIComponent(cat.name)}`}
+              href={`/category/${encodeURIComponent(cat.name)}`}
               className="group bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col items-center justify-center gap-4 transition-all duration-300 hover:shadow-md hover:border-primary/20 hover:-translate-y-1"
             >
               <div className="text-slate-700 group-hover:text-primary transition-colors duration-300">

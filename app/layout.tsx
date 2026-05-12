@@ -1,6 +1,7 @@
 import './globals.css';
 import { Toaster } from 'sonner';
 import { Metadata } from 'next';
+import Navbar from '@/components/Navbar';
 
 export const metadata: Metadata = {
   title: 'NextShop - Global Ecommerce Marketplace',
@@ -15,6 +16,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased">
+        {/* //<Navbar>></Navbar> */}
         {children}
         {/* <Toaster position="top-right" richColors /> */}
         <Toaster position="bottom-right" richColors />

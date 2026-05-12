@@ -28,7 +28,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 const categories = [
-  "Desktop", "Laptop", "Component", "Monitor", "Processor", "UPS", "Phone", "Tablet", 
+  "Desktop", "Laptop", "Component", "Monitor", "Processor", "UPS", "mobile", "Tablet", 
   "Office Equipment", "Camera", "Security", "Networking", "Software", 
   "Server & Storage", "Accessories", "Gadget", "Gaming", "TV", "Appliance"
 ];
@@ -39,6 +39,9 @@ export default function Navbar() {
 
   const { data, isPending } = useSession();
   const user = data?.user;
+
+  const data2= useSession()
+  console.log(data2)
 
   // কার্ট ডাটা লোড এবং সিঙ্ক করার জন্য ইফেক্ট
   useEffect(() => {
@@ -123,16 +126,6 @@ export default function Navbar() {
               <div className="hidden xl:block">
                 <p className="text-sm font-bold leading-tight group-hover:text-primary transition-colors">Offers</p>
                 <p className="text-[10px] text-gray-400">Latest Deals</p>
-              </div>
-            </Link>
-            
-            <Link href="/offers" className="flex items-center gap-3 group">
-              <div className="p-2 rounded-full bg-white/5 group-hover:bg-primary/20 transition-colors text-primary">
-                <Zap className="w-6 h-6" />
-              </div>
-              <div className="hidden xl:block">
-                <p className="text-sm font-bold leading-tight group-hover:text-primary transition-colors text-white">Ramadan Deal</p>
-                <p className="text-[10px] text-gray-400">Special Deals</p>
               </div>
             </Link>
             

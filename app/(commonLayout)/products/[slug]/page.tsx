@@ -23,7 +23,7 @@ const AddToCartSuccess = ({ name, image }: { name: string; image: string }) => (
       />
     </div>
     <div className="flex flex-col">
-      <p className="text-sm font-bold text-gray-900">কার্টে যোগ করা হয়েছে!</p>
+      <p className="text-sm font-bold text-gray-900"> added to cart successfully!</p>
       <p className="text-xs text-gray-500 line-clamp-1">{name}</p>
     </div>
   </div>
