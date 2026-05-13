@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button";
 import ProductCard from "@/components/product/ProductCard";
 import { Product } from "@/types";
 
-// ... আগের ইমপোর্টগুলো ঠিক আছে
 
 export default function FeaturedProducts() {
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);

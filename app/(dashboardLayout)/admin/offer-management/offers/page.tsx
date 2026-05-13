@@ -3,8 +3,7 @@
 import React, { useState } from "react";
 import { 
   Save, Image as ImageIcon, Calendar, Tag, MapPin, 
-  Globe, Info, Percent, Truck, CreditCard, ListChecks, 
-  ExternalLink, Plus, Trash2, Layout, Loader2 
+  Globe, Info, Percent, Truck, CreditCard, ListChecks, Plus, Trash2, Layout, Loader2 
 } from "lucide-react";
 import { createOfferAction } from "@/services/offerService";
 
@@ -62,7 +61,7 @@ const DetailedOfferForm = () => {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end border-b border-gray-200 pb-6 gap-4">
         <div>
           <h1 className="text-3xl font-black text-[#111827] tracking-tight">
-            OFFER <span className="text-[#FF5722]">CONFIGURATOR</span>
+            OFFER CONFIGURATOR
           </h1>
           <p className="text-gray-500 mt-1 font-medium flex items-center gap-2">
             <Layout size={16} /> Production Mode v2.1
@@ -71,7 +70,7 @@ const DetailedOfferForm = () => {
         <button 
           onClick={handleFinalSubmit}
           disabled={loading}
-          className="flex items-center gap-2 bg-[#FF5722] text-white px-8 py-4 rounded-2xl font-bold shadow-xl shadow-[#FF5722]/30 hover:bg-[#e64a19] disabled:bg-gray-400 transition-all active:scale-95"
+          className="flex items-center gap-2 bg-black text-white px-8 py-4 rounded-2xl font-bold shadow-xl  hover:bg-gray-900 disabled:bg-gray-400 transition-all active:scale-95"
         >
           {loading ? <Loader2 className="animate-spin" /> : <Save size={20} />}
           {loading ? "Processing..." : "Save Full Offer"}
@@ -164,7 +163,7 @@ const DetailedOfferForm = () => {
                   {["Online", "All Outlet"].map((type) => (
                     <button
                       key={type}
-                      className={`flex-1 py-3 rounded-xl text-xs font-bold ${basicInfo.availability === type ? "bg-[#FF5722]" : "text-gray-400"}`}
+                      className={`flex-1 py-3 rounded-xl text-[13px] font-bold ${basicInfo.availability === type ? "text-[#FF5722]" : "text-gray-400"}`}
                       onClick={() => setBasicInfo({...basicInfo, availability: type})}
                     >
                       {type}

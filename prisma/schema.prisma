@@ -258,6 +258,16 @@ model News {
   updatedAt   DateTime @updatedAt
 }
 
+model featuredCategory {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  name           String
+  iconUrl        String
+  destinationUrl String
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
 // এটি একটি টাইপ হিসেবে থাকবে যা HeroSection এর ভেতরে এম্বেড হবে
 type MainBanner {
   imageUrl       String
