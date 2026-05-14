@@ -30,9 +30,10 @@ const CategoryManagement = () => {
     try {
       const res = await fetch('/api/featured-category');
       const data = await res.json();
-      if (Array.isArray(data)) setCategories(data);
+      setCategories(Array.isArray(data) ? data : (data.categories || []));
     } catch (error) {
       console.error("Failed to fetch:", error);
+      setCategories([]);
     }
   };
 

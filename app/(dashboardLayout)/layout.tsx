@@ -47,6 +47,16 @@ const UserDashboardLayout = ({ children }: { children: React.ReactNode }) => {
       children: [{ name: "All Products", href: "/admin/products" }],
     },
     {
+      name: "Brands",
+      icon: <Package size={20} />,
+      children: [{ name: "All Brands", href: "/admin/brands" }],
+    },
+    {
+      name: "Categories",
+      icon: <Package size={20} />,
+      children: [{ name: "All Categories", href: "/admin/categories" }],
+    },
+    {
       name: "User's & Admin",
       icon: <Users size={20} />,
       children: [{ name: "Manage Users", href: "/admin/user&admin" }],

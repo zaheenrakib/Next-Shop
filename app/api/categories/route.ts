@@ -13,11 +13,23 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
-    const { name, parent } = await req.json();
-    const category = await createCategory({ name, parentId: parent === 'none' ? null : parent });
+    const body = await req.json();
+    const category = await createCategory(body);
     return NextResponse.json(category, { status: 201 });
   } catch (error: any) {
     console.error('POST /api/categories error:', error);
+    return NextResponse.json({ error: error.message }, { status: 400 });
+  }
+}
+
+export async function PATCH(req: Request) {
+  try {
+    const { id, ...data } = await req.json();
+    if (!id) return NextResponse.json({ error: 'ID is required' }, { status: 400 });
+    const category = await updateCategory(id, data);
+    return NextResponse.json(category);
+  } catch (error: any) {
+    console.error('PATCH /api/categories error:', error);
     return NextResponse.json({ error: error.message }, { status: 400 });
   }
 }

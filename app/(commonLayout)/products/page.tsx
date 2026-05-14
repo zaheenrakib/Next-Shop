@@ -33,26 +33,39 @@ export default function ProductsPage() {
   }, [selectedCategory, selectedBrands, searchQuery]);
 
   const fetchInitialData = async () => {
-    const [catRes, brandRes, attrRes] = await Promise.all([
-      fetch('/api/categories'),
-      fetch('/api/brands'),
-      fetch('/api/attribute-values')
-    ]);
-    setCategories(await catRes.json());
-    setBrands(await brandRes.json());
+    try {
+      const [catRes, brandRes, attrRes] = await Promise.all([
+        fetch('/api/categories'),
+        fetch('/api/brands'),
+        fetch('/api/attribute-values')
+      ]);
+      
+      const catData = await catRes.json();
+      setCategories(Array.isArray(catData) ? catData : (catData.categories || []));
+      
+      const brandData = await brandRes.json();
+      setBrands(Array.isArray(brandData) ? brandData : (brandData.brands || []));
 
-
-    const allValues = await attrRes.json();
-    const grouped: any[] = [];
-    allValues.forEach((val: any) => {
-      const attr = grouped.find(a => a.id === val.attribute.id);
-      if (attr) {
-        attr.values.push(val);
-      } else {
-        grouped.push({ ...val.attribute, values: [val] });
-      }
-    });
-    setAttributes(grouped);
+      const allValues = await attrRes.json();
+      const attrValuesArray = Array.isArray(allValues) ? allValues : (allValues.attributes || []);
+      
+      const grouped: any[] = [];
+      attrValuesArray.forEach((val: any) => {
+        if (!val.attribute) return;
+        const attr = grouped.find(a => a.id === val.attribute.id);
+        if (attr) {
+          attr.values.push(val);
+        } else {
+          grouped.push({ ...val.attribute, values: [val] });
+        }
+      });
+      setAttributes(grouped);
+    } catch (error) {
+      console.error('Error fetching initial data:', error);
+      setCategories([]);
+      setBrands([]);
+      setAttributes([]);
+    }
   };
 
   const fetchProducts = async () => {

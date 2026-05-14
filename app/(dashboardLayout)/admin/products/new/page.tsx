@@ -38,17 +38,29 @@ export default function NewProduct() {
   }, []);
 
   const fetchData = async () => {
-    const [catRes, brandRes, attrRes, valRes] = await Promise.all([
-      fetch('/api/categories'),
-      fetch('/api/brands'),
-      fetch('/api/attributes'),
-      fetch('/api/attribute-values')
-    ]);
+    try {
+      const [catRes, brandRes, attrRes, valRes] = await Promise.all([
+        fetch('/api/categories'),
+        fetch('/api/brands'),
+        fetch('/api/attributes'),
+        fetch('/api/attribute-values')
+      ]);
 
-    setCategories(await catRes.json());
-    setBrands(await brandRes.json());
-    setAttributes(await attrRes.json());
-    setAllAttrValues(await valRes.json());
+      const catData = await catRes.json();
+      setCategories(Array.isArray(catData) ? catData : (catData.categories || []));
+      
+      const brandData = await brandRes.json();
+      setBrands(Array.isArray(brandData) ? brandData : (brandData.brands || []));
+      
+      const attrData = await attrRes.json();
+      setAttributes(Array.isArray(attrData) ? attrData : (attrData.attributes || []));
+      
+      const valData = await valRes.json();
+      setAllAttrValues(Array.isArray(valData) ? valData : (valData.values || []));
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      toast.error('Failed to load initial data');
+    }
   };
 
   const handleCategoryChange = (catId: string) => {
