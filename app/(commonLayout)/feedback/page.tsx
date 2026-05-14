@@ -1,5 +1,6 @@
 "use client";
 
+
 import { useState } from "react";
 import { toast, Toaster } from "react-hot-toast";
 import {
@@ -12,6 +13,7 @@ import {
   Instagram,
   Cpu
 } from "lucide-react";
+
 
 export default function FeedbackPage() {
   const [loading, setLoading] = useState(false);

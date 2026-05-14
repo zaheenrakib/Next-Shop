@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from "react";
 import {
   ShoppingBag, LogOut, Menu, Search, LayoutDashboard,
-  Package, Settings, Megaphone, ChevronDown, Bell, User, Users
+  Package, Settings, Megaphone, ChevronDown, Bell, User, Users,
+  MessageSquare
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
@@ -49,6 +50,11 @@ const UserDashboardLayout = ({ children }: { children: React.ReactNode }) => {
       name: "User's & Admin",
       icon: <Users size={20} />,
       children: [{ name: "Manage Users", href: "/admin/user&admin" }],
+    },
+    {
+      name: "Complain Box",
+      icon: <MessageSquare size={20} />,
+      children: [{ name: "Manage Users", href: "/admin/manage-feedback" }],
     },
     {
       name: "Settings",
