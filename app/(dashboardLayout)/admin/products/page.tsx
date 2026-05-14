@@ -7,7 +7,6 @@ import {
   Edit,
   Trash2,
   Package,
-  Filter,
   X,
   ChevronLeft,
   ChevronRight,
@@ -324,9 +323,9 @@ export default function AdminProductsPage() {
                           <div className="text-xs text-gray-400">{product.brand?.name || "-"}</div>
                         </td>
                         <td className="px-4 py-3">
-                          <div className="font-semibold text-gray-900">${product.price.toLocaleString()}</div>
+                          <div className="font-semibold text-gray-900">${product.price?.toLocaleString() || "0"}</div>
                           {product.salePrice && (
-                            <div className="text-xs text-gray-400 line-through">${product.salePrice.toLocaleString()}</div>
+                            <div className="text-xs text-gray-400 line-through">${product.salePrice?.toLocaleString()}</div>
                           )}
                         </td>
                         <td className="px-4 py-3">{getStockBadge(product.stock)}</td>
@@ -386,9 +385,9 @@ export default function AdminProductsPage() {
                     <p className="text-xs text-gray-400 mt-0.5">SKU: {product.sku}</p>
                     <div className="flex items-center justify-between mt-2">
                       <div>
-                        <span className="font-bold text-gray-900">${product.price.toLocaleString()}</span>
+                        <span className="font-bold text-gray-900">${product.price?.toLocaleString() || "0"}</span>
                         {product.salePrice && (
-                          <span className="text-xs text-gray-400 line-through ml-1">${product.salePrice.toLocaleString()}</span>
+                          <span className="text-xs text-gray-400 line-through ml-1">${product.salePrice?.toLocaleString()}</span>
                         )}
                       </div>
                       {getStockBadge(product.stock)}

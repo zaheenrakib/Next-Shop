@@ -1,60 +1,122 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { X, Plus, Trash2, Image as ImageIcon, Layout, Tag, ShieldCheck, Activity } from "lucide-react";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { 
+  X, Plus, Trash2, Image as ImageIcon, Layout, Tag, 
+  ShieldCheck, Activity, DollarSign, Package, Truck, Globe,
+  AlertCircle
+} from "lucide-react";
 import { toast } from "react-hot-toast";
+import TiptapEditor from "./TiptapEditor";
+
+const productSchema = z.object({
+  name: z.string().min(3, "Name must be at least 3 characters"),
+  slug: z.string().min(3, "Slug must be at least 3 characters"),
+  categoryId: z.string().min(1, "Category is required"),
+  subCategoryId: z.string().optional().nullable(),
+  brandId: z.string().optional().nullable(),
+  shortDescription: z.string().optional(),
+  longDescription: z.string().optional(),
+  thumbnail: z.string().url("Must be a valid URL").or(z.literal("")),
+  images: z.array(z.string()).default([]),
+  
+  // Pricing
+  basePrice: z.number().min(0, "Price cannot be negative"),
+  comparePrice: z.number().min(0).optional().nullable(),
+  costPerItem: z.number().min(0).optional().nullable(),
+  
+  // Inventory
+  stockQuantity: z.number().int().min(0, "Stock cannot be negative"),
+  lowStockThreshold: z.number().int().min(0).default(5),
+  sku: z.string().optional(),
+  barcode: z.string().optional(),
+  
+  // Shipping
+  weight: z.number().optional().nullable(),
+  length: z.number().optional().nullable(),
+  width: z.number().optional().nullable(),
+  height: z.number().optional().nullable(),
+  
+  // Status & Flags
+  status: z.enum(["DRAFT", "PENDING", "ACTIVE", "INACTIVE", "REJECTED"]),
+  isVariantParent: z.boolean().default(false),
+  isFeatured: z.boolean().default(false),
+  isFreeShipping: z.boolean().default(false),
+  taxClass: z.string().default("standard"),
+  
+  // SEO
+  metaTitle: z.string().optional().nullable(),
+  metaDescription: z.string().optional().nullable(),
+  
+  tags: z.string().or(z.array(z.string())).optional(),
+});
+
+type ProductFormValues = z.infer<typeof productSchema>;
 
 export default function ProductModal({ product, onClose, refresh }: any) {
-  const [formData, setFormData] = useState<any>({
-    name: "", slug: "", price: 0, discountPrice: 0, stock: 0,
-    categoryId: "", brandId: "", description: "", shortDescription: "",
-    thumbnail: "", images: [], status: "active", sku: "",
-    model: "", warranty: "", tags: "",
-    specifications: {}
-  });
-
   const [categories, setCategories] = useState([]);
   const [brands, setBrands] = useState([]);
-  const [specKey, setSpecKey] = useState("");
-  const [specValue, setSpecValue] = useState("");
+  const [activeTab, setActiveTab] = useState("basic");
+
+  const {
+    register,
+    handleSubmit,
+    control,
+    setValue,
+    watch,
+    formState: { errors, isSubmitting },
+  } = useForm<ProductFormValues>({
+    resolver: zodResolver(productSchema),
+    defaultValues: product ? {
+      ...product,
+      tags: product.tags ? product.tags.join(", ") : "",
+      subCategoryId: product.subCategoryId || null,
+      brandId: product.brandId || null,
+    } : {
+      name: "",
+      slug: "",
+      categoryId: "",
+      status: "PENDING",
+      basePrice: 0,
+      stockQuantity: 0,
+      lowStockThreshold: 5,
+      isFeatured: false,
+      isFreeShipping: false,
+      taxClass: "standard",
+    }
+  });
+
+  const productName = watch("name");
 
   useEffect(() => {
-    fetch("/api/categories").then(res => res.json()).then(setCategories);
-    fetch("/api/brands").then(res => res.json()).then(setBrands);
-
-    if (product) {
-      setFormData({
-        ...product,
-        tags: product.tags ? product.tags.join(", ") : ""
-      });
+    // Auto-generate slug from name if creating new
+    if (!product && productName) {
+      const slug = productName.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
+      setValue("slug", slug);
     }
-  }, [product]);
+  }, [productName, setValue, product]);
 
-  const addSpec = () => {
-    if (specKey && specValue) {
-      setFormData({
-        ...formData,
-        specifications: { ...formData.specifications, [specKey]: specValue }
-      });
-      setSpecKey(""); setSpecValue("");
-    }
-  };
+  useEffect(() => {
+    fetch("/api/categories")
+      .then(res => res.json())
+      .then(data => setCategories(Array.isArray(data) ? data : (data.categories || [])));
+    
+    fetch("/api/brands")
+      .then(res => res.json())
+      .then(data => setBrands(Array.isArray(data) ? data : (data.brands || [])));
+  }, []);
 
-  const removeSpec = (key: string) => {
-    const newSpecs = { ...formData.specifications };
-    delete newSpecs[key];
-    setFormData({ ...formData, specifications: newSpecs });
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (data: ProductFormValues) => {
     const method = product ? "PUT" : "POST";
     const url = product ? `/api/products/${product.id}` : "/api/products";
 
     try {
       const finalPayload = {
-        ...formData,
-        tags: typeof formData.tags === 'string' ? formData.tags.split(",").map((t: string) => t.trim()) : formData.tags
+        ...data,
+        tags: typeof data.tags === 'string' ? data.tags.split(",").map((t: string) => t.trim()).filter(Boolean) : data.tags
       };
 
       const res = await fetch(url, {
@@ -64,161 +126,376 @@ export default function ProductModal({ product, onClose, refresh }: any) {
       });
 
       if (res.ok) {
-        toast.success(product ? "মাখন আপডেট হয়েছে!" : "প্রোডাক্ট পাবলিশ হয়েছে!");
+        toast.success(product ? "Product updated successfully!" : "Product created successfully!");
         refresh();
         onClose();
+      } else {
+        const errData = await res.json();
+        toast.error(errData.error || "Something went wrong!");
       }
     } catch (err) {
-      toast.error("মামা, কিছু একটা গড়বড় হইছে!");
+      toast.error("An unexpected error occurred!");
     }
   };
+
+  const renderError = (field: keyof ProductFormValues) => {
+    if (errors[field]) {
+      return (
+        <p className="text-rose-500 text-xs mt-1 flex items-center gap-1">
+          <AlertCircle size={12} /> {errors[field]?.message as string}
+        </p>
+      );
+    }
+    return null;
+  };
+
+  const tabs = [
+    { id: "basic", label: "Basic Info", icon: <Layout size={16} /> },
+    { id: "pricing", label: "Pricing & Inventory", icon: <DollarSign size={16} /> },
+    { id: "shipping", label: "Shipping", icon: <Truck size={16} /> },
+    { id: "seo", label: "SEO & Meta", icon: <Globe size={16} /> },
+  ];
 
   return (
     <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-md z-50 flex justify-end transition-all">
       <div className="w-full max-w-4xl bg-white h-full overflow-y-auto shadow-2xl animate-in slide-in-from-right duration-500 flex flex-col">
-
-
+        
+        {/* Header */}
         <div className="sticky top-0 bg-white/80 backdrop-blur-md z-10 px-8 py-5 border-b border-slate-100 flex justify-between items-center">
           <div>
-            <h2 className="text-xl font-bold text-slate-800">{product ? "Update Product" : "New Premium Entry"}</h2>
+            <h2 className="text-xl font-bold text-slate-800">
+              {product ? "Edit Premium Product" : "New Premium Product"}
+            </h2>
+            <p className="text-xs text-slate-500">Comprehensive catalog management system</p>
           </div>
           <button onClick={onClose} className="p-2 hover:bg-slate-100 text-slate-400 hover:text-rose-500 rounded-xl transition-all">
             <X size={24} />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-8 space-y-8 flex-1">
-
-
-          <div className="space-y-4">
-            <h3 className="text-sm font-semibold text-blue-600 flex items-center gap-2">
-              <Layout size={16} /> Basic Information
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-slate-700 mb-1">Product Title</label>
-                <input value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 ring-blue-100 focus:border-blue-500 outline-none transition-all" placeholder="Enter product name..." required />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Category</label>
-                <select value={formData.categoryId} onChange={e => setFormData({ ...formData, categoryId: e.target.value })} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-blue-500 transition-all">
-                  <option value="">Choose Category</option>
-                  {categories.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Brand</label>
-                <select value={formData.brandId} onChange={e => setFormData({ ...formData, brandId: e.target.value })} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-blue-500 transition-all">
-                  <option value="">Choose Brand</option>
-                  {brands.map((b: any) => <option key={b.id} value={b.id}>{b.name}</option>)}
-                </select>
-              </div>
-            </div>
-          </div>
-
-
-          <div className="space-y-4 pt-4 border-t border-slate-50">
-            <h3 className="text-sm font-semibold text-blue-600 flex items-center gap-2">
-              <ImageIcon size={16} /> Media & Assets
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-slate-700 mb-1">Thumbnail URL</label>
-                <input value={formData.thumbnail} onChange={e => setFormData({ ...formData, thumbnail: e.target.value })} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:border-blue-500 outline-none" placeholder="https://image-link.com" />
-              </div>
-              <div className="h-32 w-full bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl flex items-center justify-center overflow-hidden">
-                {formData.thumbnail ? (
-                  <img src={formData.thumbnail} alt="Preview" className="w-full h-full object-cover" />
-                ) : (
-                  <div className="text-center text-slate-400">
-                    <ImageIcon size={24} className="mx-auto mb-1" />
-                    <span className="text-xs">No Preview</span>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-5 p-6 bg-blue-50/50 rounded-2xl border border-blue-100/50">
-            <div>
-              <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Price (৳)</label>
-              <input type="number" value={formData.price} onChange={e => setFormData({ ...formData, price: Number(e.target.value) })} className="w-full px-4 py-2 bg-white border border-slate-200 rounded-lg outline-none" />
-            </div>
-            <div>
-              <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Discounted</label>
-              <input type="number" value={formData.discountPrice} onChange={e => setFormData({ ...formData, discountPrice: Number(e.target.value) })} className="w-full px-4 py-2 bg-white border border-slate-200 rounded-lg outline-none" />
-            </div>
-            <div>
-              <label className="block text-xs font-bold text-slate-500 uppercase mb-1">In Stock</label>
-              <input type="number" value={formData.stock} onChange={e => setFormData({ ...formData, stock: Number(e.target.value) })} className="w-full px-4 py-2 bg-white border border-slate-200 rounded-lg outline-none" />
-            </div>
-            <div>
-              <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Status</label>
-              <select value={formData.status} onChange={e => setFormData({ ...formData, status: e.target.value })} className="w-full px-4 py-2 bg-white border border-slate-200 rounded-lg outline-none">
-                <option value="active">Active</option>
-                <option value="draft">Draft</option>
-                <option value="out_of_stock">Out of Stock</option>
-              </select>
-            </div>
-          </div>
-
-
-          <div className="space-y-4 pt-4">
-            <h3 className="text-sm font-semibold text-blue-600 flex items-center gap-2">
-              <Activity size={16} /> Content & Descriptions
-            </h3>
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Short Description (Snippet)</label>
-              <input value={formData.shortDescription} onChange={e => setFormData({ ...formData, shortDescription: e.target.value })} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none" placeholder="A quick summary for list view..." />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Full Description</label>
-              <textarea rows={5} value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none resize-none" placeholder="Describe everything about the product..."></textarea>
-            </div>
-          </div>
-
-
-          <div className="space-y-4">
-            <h3 className="text-sm font-semibold text-blue-600 flex items-center gap-2">
-              <ShieldCheck size={16} /> Technical Specifications
-            </h3>
-            <div className="flex gap-3">
-              <input placeholder="Key (e.g. RAM)" value={specKey} onChange={e => setSpecKey(e.target.value)} className="flex-1 px-4 py-2 border border-slate-200 rounded-xl outline-none focus:border-blue-500 transition-all" />
-              <input placeholder="Value (e.g. 16GB)" value={specValue} onChange={e => setSpecValue(e.target.value)} className="flex-1 px-4 py-2 border border-slate-200 rounded-xl outline-none focus:border-blue-500 transition-all" />
-              <button type="button" onClick={addSpec} className="px-4 bg-slate-800 text-white rounded-xl hover:bg-black transition-all">
-                <Plus size={20} />
-              </button>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {Object.entries(formData.specifications || {}).map(([key, val]: any) => (
-                <div key={key} className="flex justify-between items-center p-3 bg-slate-50 border border-slate-100 rounded-xl">
-                  <span className="text-sm"><b className="text-slate-600">{key}:</b> <span className="text-slate-500">{val}</span></span>
-                  <button type="button" onClick={() => removeSpec(key)} className="text-rose-400 hover:text-rose-600 p-1 hover:bg-rose-50 rounded-lg transition-all"><Trash2 size={16} /></button>
-                </div>
-              ))}
-            </div>
-          </div>
-
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pt-4">
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1 flex items-center gap-2"><ShieldCheck size={14} /> Warranty</label>
-              <input value={formData.warranty} onChange={e => setFormData({ ...formData, warranty: e.target.value })} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none" placeholder="e.g. 1 Year Service Warranty" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1 flex items-center gap-2"><Tag size={14} /> Tags</label>
-              <input value={formData.tags} onChange={e => setFormData({ ...formData, tags: e.target.value })} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none" placeholder="tag1, tag2, tag3" />
-            </div>
-          </div>
-
-
-          <div className="sticky bottom-0 bg-white/90 backdrop-blur-md pt-6 pb-2 border-t border-slate-100 flex gap-4">
-            <button type="submit" className="flex-1 bg-blue-600 text-white py-3.5 rounded-2xl font-bold hover:bg-blue-700 shadow-xl shadow-blue-200 transition-all transform active:scale-[0.98]">
-              {product ? "Update Changes" : "Create Product Now"}
+        {/* Tab Navigation */}
+        <div className="px-8 border-b border-slate-100 flex gap-6">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`py-4 text-sm font-semibold transition-all border-b-2 flex items-center gap-2 ${
+                activeTab === tab.id 
+                ? "border-blue-600 text-blue-600" 
+                : "border-transparent text-slate-500 hover:text-slate-800"
+              }`}
+            >
+              {tab.icon} {tab.label}
             </button>
-            <button type="button" onClick={onClose} className="px-10 bg-slate-100 text-slate-600 py-3.5 rounded-2xl font-semibold hover:bg-slate-200 transition-all">
-              Cancel
+          ))}
+        </div>
+
+        <form onSubmit={handleSubmit(onSubmit)} className="p-8 space-y-8 flex-1">
+          
+          {/* Basic Information Section */}
+          {activeTab === "basic" && (
+            <div className="space-y-6 animate-in fade-in duration-300">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Product Title</label>
+                  <input 
+                    {...register("name")}
+                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 ring-blue-100 focus:border-blue-500 outline-none transition-all" 
+                    placeholder="e.g. iPhone 15 Pro Max Titanium" 
+                  />
+                  {renderError("name")}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">URL Slug</label>
+                  <input 
+                    {...register("slug")}
+                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:border-blue-500 outline-none" 
+                    placeholder="iphone-15-pro-max" 
+                  />
+                  {renderError("slug")}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Main Category</label>
+                  <select 
+                    {...register("categoryId")}
+                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-blue-500"
+                  >
+                    <option value="">Choose Category</option>
+                    {categories.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                  </select>
+                  {renderError("categoryId")}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Brand</label>
+                  <select 
+                    {...register("brandId")}
+                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-blue-500"
+                  >
+                    <option value="">None / Choose Brand</option>
+                    {brands.map((b: any) => <option key={b.id} value={b.id}>{b.name}</option>)}
+                  </select>
+                </div>
+
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Short Description</label>
+                  <Controller
+                    name="shortDescription"
+                    control={control}
+                    render={({ field }) => (
+                      <TiptapEditor 
+                        value={field.value || ""} 
+                        onChange={field.onChange} 
+                        placeholder="Brief highlights..." 
+                      />
+                    )}
+                  />
+                </div>
+
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Long Description</label>
+                  <Controller
+                    name="longDescription"
+                    control={control}
+                    render={({ field }) => (
+                      <TiptapEditor 
+                        value={field.value || ""} 
+                        onChange={field.onChange} 
+                        placeholder="Detailed product information..." 
+                      />
+                    )}
+                  />
+                </div>
+
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Thumbnail URL</label>
+                  <div className="flex gap-4">
+                    <input 
+                      {...register("thumbnail")}
+                      className="flex-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:border-blue-500 outline-none" 
+                      placeholder="https://image-link.com" 
+                    />
+                    <div className="h-11 w-11 bg-slate-100 rounded-lg flex items-center justify-center overflow-hidden border border-slate-200">
+                      {watch("thumbnail") ? (
+                        <img src={watch("thumbnail")} alt="Mini" className="w-full h-full object-cover" />
+                      ) : (
+                        <ImageIcon size={18} className="text-slate-400" />
+                      )}
+                    </div>
+                  </div>
+                  {renderError("thumbnail")}
+                </div>
+
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Tags (Comma separated)</label>
+                  <input 
+                    {...register("tags")}
+                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none" 
+                    placeholder="tech, mobile, flagship" 
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Pricing & Inventory Section */}
+          {activeTab === "pricing" && (
+            <div className="space-y-6 animate-in fade-in duration-300">
+              <div className="p-6 bg-blue-50/50 rounded-2xl border border-blue-100/50">
+                <h4 className="text-sm font-bold text-blue-700 mb-4 flex items-center gap-2">
+                  <DollarSign size={16} /> Financial Details
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Base Price (৳)</label>
+                    <input 
+                      type="number" 
+                      {...register("basePrice", { valueAsNumber: true })}
+                      className="w-full px-4 py-2 bg-white border border-slate-200 rounded-lg outline-none focus:border-blue-500" 
+                    />
+                    {renderError("basePrice")}
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Compare At Price (৳)</label>
+                    <input 
+                      type="number" 
+                      {...register("comparePrice", { valueAsNumber: true })}
+                      className="w-full px-4 py-2 bg-white border border-slate-200 rounded-lg outline-none focus:border-blue-500" 
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Cost Per Item (৳)</label>
+                    <input 
+                      type="number" 
+                      {...register("costPerItem", { valueAsNumber: true })}
+                      className="w-full px-4 py-2 bg-white border border-slate-200 rounded-lg outline-none focus:border-blue-500" 
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100">
+                <h4 className="text-sm font-bold text-slate-700 mb-4 flex items-center gap-2">
+                  <Package size={16} /> Stock Management
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Total Stock</label>
+                    <input 
+                      type="number" 
+                      {...register("stockQuantity", { valueAsNumber: true })}
+                      className="w-full px-4 py-2 bg-white border border-slate-200 rounded-lg outline-none focus:border-blue-500" 
+                    />
+                    {renderError("stockQuantity")}
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Low Stock Alert</label>
+                    <input 
+                      type="number" 
+                      {...register("lowStockThreshold", { valueAsNumber: true })}
+                      className="w-full px-4 py-2 bg-white border border-slate-200 rounded-lg outline-none focus:border-blue-500" 
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-slate-500 uppercase mb-1">SKU</label>
+                    <input 
+                      {...register("sku")}
+                      className="w-full px-4 py-2 bg-white border border-slate-200 rounded-lg outline-none focus:border-blue-500" 
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Status</label>
+                    <select 
+                      {...register("status")}
+                      className="w-full px-4 py-2 bg-white border border-slate-200 rounded-lg outline-none focus:border-blue-500"
+                    >
+                      <option value="PENDING">Pending</option>
+                      <option value="ACTIVE">Active</option>
+                      <option value="DRAFT">Draft</option>
+                      <option value="INACTIVE">Inactive</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex gap-8 px-2">
+                <label className="flex items-center gap-3 cursor-pointer group">
+                  <input type="checkbox" {...register("isFeatured")} className="w-5 h-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500" />
+                  <span className="text-sm font-semibold text-slate-600 group-hover:text-slate-900 transition-colors">Featured Product</span>
+                </label>
+                <label className="flex items-center gap-3 cursor-pointer group">
+                  <input type="checkbox" {...register("isFreeShipping")} className="w-5 h-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500" />
+                  <span className="text-sm font-semibold text-slate-600 group-hover:text-slate-900 transition-colors">Free Shipping</span>
+                </label>
+              </div>
+            </div>
+          )}
+
+          {/* Shipping Section */}
+          {activeTab === "shipping" && (
+            <div className="space-y-6 animate-in fade-in duration-300">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1 flex items-center gap-2">
+                    <Truck size={14} /> Product Weight (kg)
+                  </label>
+                  <input 
+                    type="number" 
+                    step="0.01"
+                    {...register("weight", { valueAsNumber: true })}
+                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-blue-500" 
+                    placeholder="0.00"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Tax Class</label>
+                  <select 
+                    {...register("taxClass")}
+                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-blue-500"
+                  >
+                    <option value="standard">Standard Tax</option>
+                    <option value="reduced">Reduced Rate</option>
+                    <option value="zero">Zero Rated</option>
+                    <option value="exempt">Tax Exempt</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="pt-4">
+                <h4 className="text-xs font-bold text-slate-400 uppercase mb-4 tracking-wider">Physical Dimensions (cm)</h4>
+                <div className="grid grid-cols-3 gap-6">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-500 mb-1">Length</label>
+                    <input type="number" {...register("length", { valueAsNumber: true })} className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg outline-none" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-500 mb-1">Width</label>
+                    <input type="number" {...register("width", { valueAsNumber: true })} className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg outline-none" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-500 mb-1">Height</label>
+                    <input type="number" {...register("height", { valueAsNumber: true })} className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg outline-none" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* SEO Section */}
+          {activeTab === "seo" && (
+            <div className="space-y-6 animate-in fade-in duration-300">
+              <div className="p-6 bg-emerald-50/30 rounded-2xl border border-emerald-100/50">
+                <h4 className="text-sm font-bold text-emerald-700 mb-4 flex items-center gap-2">
+                  <Globe size={16} /> Search Engine Optimization
+                </h4>
+                <div className="space-y-5">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Meta Title</label>
+                    <input 
+                      {...register("metaTitle")}
+                      className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl focus:border-emerald-500 outline-none" 
+                      placeholder="SEO Title (recommended < 60 chars)" 
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Meta Description</label>
+                    <textarea 
+                      {...register("metaDescription")}
+                      rows={4}
+                      className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl outline-none resize-none focus:border-emerald-500"
+                      placeholder="Detailed SEO description (recommended < 160 chars)"
+                    />
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 flex items-start gap-3">
+                <AlertCircle size={20} className="text-slate-400 mt-0.5" />
+                <div className="text-xs text-slate-500 leading-relaxed">
+                  Proper SEO information helps your product appear in Google search results. 
+                  If left empty, the system will fallback to the Product Name and Short Description.
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Submit Buttons */}
+          <div className="sticky bottom-0 bg-white/90 backdrop-blur-md pt-6 pb-2 border-t border-slate-100 flex gap-4">
+            <button 
+              type="submit" 
+              disabled={isSubmitting}
+              className="flex-1 bg-blue-600 text-white py-3.5 rounded-2xl font-bold hover:bg-blue-700 shadow-xl shadow-blue-200 transition-all transform active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              {isSubmitting ? "Processing..." : (product ? "Save Premium Changes" : "Publish Premium Product")}
+            </button>
+            <button 
+              type="button" 
+              onClick={onClose} 
+              className="px-10 bg-slate-100 text-slate-600 py-3.5 rounded-2xl font-semibold hover:bg-slate-200 transition-all"
+            >
+              Discard
             </button>
           </div>
         </form>

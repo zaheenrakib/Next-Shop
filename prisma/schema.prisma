@@ -75,6 +75,30 @@ model Verification {
 enum Role {
   USER
   ADMIN
+  VENDOR
+}
+
+enum ProductStatus {
+  DRAFT
+  PENDING
+  ACTIVE
+  INACTIVE
+  REJECTED
+}
+
+enum AttributeType {
+  SELECT
+  RADIO
+  COLOR_SWATCH
+  BUTTON
+}
+
+enum TransactionType {
+  PURCHASE
+  SALE
+  RETURN
+  ADJUSTMENT
+  RESTOCK
 }
 
 model Brand {
@@ -84,104 +108,168 @@ model Brand {
 }
 
 model Category {
-  id                 String              @id @default(auto()) @map("_id") @db.ObjectId
-  name               String              @unique
-  parentId           String?             @db.ObjectId
-  parent             Category?           @relation("CategoryToCategory", fields: [parentId], references: [id], onUpdate: NoAction, onDelete: NoAction)
-  children           Category[]          @relation("CategoryToCategory")
-  products           Product[]
-  categoryAttributes CategoryAttribute[]
+  id             String    @id @default(auto()) @map("_id") @db.ObjectId
+  name           String    @unique
+  slug           String?
+  parentId       String?   @db.ObjectId
+  parent         Category? @relation("CategoryToCategory", fields: [parentId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  children       Category[] @relation("CategoryToCategory")
+  image          String?
+  icon           String?
+  isActive       Boolean   @default(true)
+  sortOrder      Int       @default(0)
+  products       Product[]
+  subProducts    Product[] @relation("SubCategory")
 }
 
-model Attribute {
-  id                    String                 @id @default(auto()) @map("_id") @db.ObjectId
-  name                  String                 @unique
-  type                  String                 @default("text")
-  values                AttributeValue[]
-  categoryAttributes    CategoryAttribute[]
-  productSpecifications ProductSpecification[]
+model VariantAttribute {
+  id           String          @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  displayName  String?
+  type         AttributeType   @default(SELECT)
+  isGlobal     Boolean         @default(true)
+  options      VariantOption[]
+  productAttributes ProductVariantAttribute[]
+  createdAt    DateTime        @default(now())
 }
 
-model AttributeValue {
-  id                String             @id @default(auto()) @map("_id") @db.ObjectId
-  attributeId       String             @db.ObjectId
-  attribute         Attribute          @relation(fields: [attributeId], references: [id])
-  value             String
-  variantAttributes VariantAttribute[]
+model VariantOption {
+  id          String           @id @default(auto()) @map("_id") @db.ObjectId
+  attributeId String           @db.ObjectId
+  attribute   VariantAttribute @relation(fields: [attributeId], references: [id], onDelete: Cascade)
+  value       String
+  colorCode   String?
+  imageUrl    String?
+  sortOrder   Int              @default(0)
 
   @@unique([attributeId, value])
 }
 
 model Product {
   id               String                 @id @default(auto()) @map("_id") @db.ObjectId
-  name             String
-  slug             String                 @unique
-  description      String?
-  shortDescription String?
-  thumbnail        String?
-  images           String[]
-  status           String                 @default("draft")
-  sku              String?
-  model            String?
-  price            Int?
-  discountPrice    Int?
-  stock            Int?
-  sold             Int?
-  rating           Float?
-  reviews          Int?
-  warranty         String?
-  tags             String[]
-  brandId          String                 @db.ObjectId
-  brand            Brand                  @relation(fields: [brandId], references: [id])
   categoryId       String                 @db.ObjectId
   category         Category               @relation(fields: [categoryId], references: [id])
-  variants         Variant[]
-  specifications   ProductSpecification[]
+  subCategoryId    String?                @db.ObjectId
+  subCategory      Category?              @relation("SubCategory", fields: [subCategoryId], references: [id])
+  
+  // Basic Info
+  name             String
+  slug             String                 @unique
+  shortDescription String?
+  longDescription  String?
+  thumbnail        String?                // maps to main_image
+  images           String[]               // maps to gallery_images
+  
+  // Pricing
+  basePrice        Float?
+  comparePrice     Float?
+  costPerItem      Float?
+  
+  // Inventory
+  stockQuantity    Int                    @default(0)
+  lowStockThreshold Int                   @default(5)
+  sku              String?
+  barcode          String?
+  
+  // Shipping
+  weight           Float?
+  length           Float?
+  width            Float?
+  height           Float?
+  
+  // Status & Flags
+  status           ProductStatus          @default(PENDING)
+  isVariantParent  Boolean                @default(false)
+  isFeatured       Boolean                @default(false)
+  isFreeShipping   Boolean                @default(false)
+  taxClass         String                 @default("standard")
+  
+  // SEO
+  metaTitle        String?
+  metaDescription  String?
+
+  brandId          String?                @db.ObjectId
+  brand            Brand?                 @relation(fields: [brandId], references: [id])
+  
+  variants         ProductVariant[]
+  productAttributes ProductVariantAttribute[]
+  inventoryTransactions InventoryTransaction[]
+  
   createdAt        DateTime               @default(now())
   updatedAt        DateTime               @updatedAt
 }
 
-model ProductSpecification {
-  id          String    @id @default(auto()) @map("_id") @db.ObjectId
-  productId   String    @db.ObjectId
-  product     Product   @relation(fields: [productId], references: [id])
-  attributeId String    @db.ObjectId
-  attribute   Attribute @relation(fields: [attributeId], references: [id])
-  value       String
+model ProductVariantAttribute {
+  id          String           @id @default(auto()) @map("_id") @db.ObjectId
+  productId   String           @db.ObjectId
+  product     Product          @relation(fields: [productId], references: [id], onDelete: Cascade)
+  attributeId String           @db.ObjectId
+  attribute   VariantAttribute @relation(fields: [attributeId], references: [id])
+  displayOrder Int             @default(0)
+
+  @@unique([productId, attributeId])
 }
 
-model Variant {
-  id                String             @id @default(auto()) @map("_id") @db.ObjectId
-  productId         String             @db.ObjectId
-  product           Product            @relation(fields: [productId], references: [id])
-  sku               String             @unique
-  price             Float
-  stock             Int                @default(0)
-  image             String?
-  variantAttributes VariantAttribute[]
-  createdAt         DateTime           @default(now())
-  updatedAt         DateTime           @updatedAt
+model ProductVariant {
+  id               String           @id @default(auto()) @map("_id") @db.ObjectId
+  productId         String           @db.ObjectId
+  product           Product          @relation(fields: [productId], references: [id], onDelete: Cascade)
+  
+  combination      Json             // {"color": "Red", "size": "XL"}
+  combinationHash  String           @unique
+  
+  price            Float
+  comparePrice     Float?
+  costPerItem      Float?
+  
+  sku              String           @unique
+  barcode          String?
+  stockQuantity    Int              @default(0)
+  lowStockThreshold Int             @default(5)
+  
+  image            String?          // variant_image
+  additionalImages String[]         // additional_images JSON
+  images           VariantImage[]
+  
+  weight           Float?
+  length           Float?
+  width            Float?
+  height           Float?
+  
+  isActive         Boolean          @default(true)
+  
+  inventoryTransactions InventoryTransaction[]
+  
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
 }
 
-model VariantAttribute {
-  id               String         @id @default(auto()) @map("_id") @db.ObjectId
-  variantId        String         @db.ObjectId
-  variant          Variant        @relation(fields: [variantId], references: [id])
-  attributeValueId String         @db.ObjectId
-  attributeValue   AttributeValue @relation(fields: [attributeValueId], references: [id])
-
-  @@unique([variantId, attributeValueId])
+model VariantImage {
+  id         String         @id @default(auto()) @map("_id") @db.ObjectId
+  variantId  String         @db.ObjectId
+  variant    ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  imageUrl   String
+  isDefault  Boolean        @default(false)
+  sortOrder  Int            @default(0)
 }
 
-model CategoryAttribute {
-  id          String    @id @default(auto()) @map("_id") @db.ObjectId
-  categoryId  String    @db.ObjectId
-  category    Category  @relation(fields: [categoryId], references: [id])
-  attributeId String    @db.ObjectId
-  attribute   Attribute @relation(fields: [attributeId], references: [id])
-
-  @@unique([categoryId, attributeId])
+model InventoryTransaction {
+  id              String          @id @default(auto()) @map("_id") @db.ObjectId
+  variantId       String?         @db.ObjectId
+  variant         ProductVariant? @relation(fields: [variantId], references: [id])
+  productId       String?         @db.ObjectId
+  product         Product?        @relation(fields: [productId], references: [id])
+  
+  transactionType TransactionType
+  quantity        Int
+  previousQuantity Int
+  newQuantity     Int
+  referenceId     String?
+  notes           String?
+  createdBy       String?         @db.ObjectId
+  createdAt       DateTime        @default(now())
 }
+
 
 model Feedback {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId

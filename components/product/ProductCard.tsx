@@ -11,10 +11,10 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
-  const currentPrice = product.discountPrice || product.price;
-  const originalPrice = product.price;
-  const saveAmount = originalPrice - currentPrice;
-  const discountPercentage = Math.round((saveAmount / originalPrice) * 100);
+  const currentPrice = product?.discountPrice || product?.price || 0;
+  const originalPrice = product?.price || 0;
+  const saveAmount = Math.max(0, originalPrice - currentPrice);
+  const discountPercentage = originalPrice > 0 ? Math.round((saveAmount / originalPrice) * 100) : 0;
 
   return (
     <Card className="group relative flex flex-col h-full overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-500 rounded-xl bg-white">
