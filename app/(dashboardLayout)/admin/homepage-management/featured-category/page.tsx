@@ -15,13 +15,13 @@ interface Category {
 const CategoryManagement = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
-  
-  // Modals State
+
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-  
-  // Form State
+
+
   const [formData, setFormData] = useState({ id: '', name: '', iconUrl: '', destinationUrl: '' });
   const [isEditMode, setIsEditMode] = useState(false);
   const [selectedForDelete, setSelectedForDelete] = useState<string | null>(null);
@@ -98,7 +98,7 @@ const CategoryManagement = () => {
         headers: { 'Content-Type': 'application/json' }
       });
       if (response.ok) {
-        setCategories(prev => 
+        setCategories(prev =>
           prev.map(cat => cat.id === id ? { ...cat, isActive: !currentStatus } : cat)
         );
       }
@@ -127,10 +127,10 @@ const CategoryManagement = () => {
 
   return (
     <div className="max-w-6xl mx-auto p-6 space-y-8 text-slate-800">
-      {/* Header */}
+
       <div className="flex items-center justify-between bg-white p-6 rounded-2xl border shadow-sm">
         <h2 className="text-2xl font-bold">Featured Categories</h2>
-        <button 
+        <button
           onClick={() => openModal()}
           className="bg-black hover:bg-gray-800 text-white px-5 py-2.5 rounded-xl font-medium flex items-center gap-2 transition active:scale-95"
         >
@@ -139,7 +139,7 @@ const CategoryManagement = () => {
         </button>
       </div>
 
-      {/* Table */}
+
       <div className="bg-white border rounded-2xl overflow-hidden shadow-sm">
         <table className="w-full text-left">
           <thead className="bg-slate-50 border-b">
@@ -162,24 +162,22 @@ const CategoryManagement = () => {
                 <td className="p-4 text-center">
                   <button
                     onClick={() => toggleStatus(cat.id, cat.isActive)}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 outline-none ${
-                      cat.isActive ? 'bg-green-500' : 'bg-slate-300'
-                    }`}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 outline-none ${cat.isActive ? 'bg-green-500' : 'bg-slate-300'
+                      }`}
                   >
-                    <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200 ${
-                      cat.isActive ? 'translate-x-6' : 'translate-x-1'
-                    }`} />
+                    <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200 ${cat.isActive ? 'translate-x-6' : 'translate-x-1'
+                      }`} />
                   </button>
                 </td>
                 <td className="p-4 text-right space-x-2">
-                  <button 
-                    onClick={() => openModal(cat)} 
+                  <button
+                    onClick={() => openModal(cat)}
                     className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition"
                   >
                     <Edit2 size={18} />
                   </button>
-                  <button 
-                    onClick={() => { setSelectedForDelete(cat.id); setIsDeleteModalOpen(true); }} 
+                  <button
+                    onClick={() => { setSelectedForDelete(cat.id); setIsDeleteModalOpen(true); }}
                     className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition"
                   >
                     <Trash2 size={18} />
@@ -192,7 +190,7 @@ const CategoryManagement = () => {
       </div>
 
       <AnimatePresence>
-        {/* Main Form Modal */}
+
         {isModalOpen && (
           <div className="fixed inset-0   z-50 flex items-center justify-center p-4">
             <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }} className="bg-white rounded-3xl shadow-2xl w-full max-w-lg p-8 relative space-y-6">
@@ -200,19 +198,19 @@ const CategoryManagement = () => {
                 <X size={24} />
               </button>
               <h3 className="text-2xl font-bold">{isEditMode ? 'Edit Category' : 'New Category'}</h3>
-              
+
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   <label className="text-sm font-semibold mb-1 block text-slate-600">Category Name</label>
-                  <input type="text" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className="w-full px-4 py-2.5 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 transition" required />
+                  <input type="text" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full px-4 py-2.5 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 transition" required />
                 </div>
                 <div>
                   <label className="text-sm font-semibold mb-1 block text-slate-600">Icon URL</label>
-                  <input type="url" value={formData.iconUrl} onChange={(e) => setFormData({...formData, iconUrl: e.target.value})} className="w-full px-4 py-2.5 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 transition" required />
+                  <input type="url" value={formData.iconUrl} onChange={(e) => setFormData({ ...formData, iconUrl: e.target.value })} className="w-full px-4 py-2.5 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 transition" required />
                 </div>
                 <div>
                   <label className="text-sm font-semibold mb-1 block text-slate-600">Destination Route</label>
-                  <input type="text" value={formData.destinationUrl} onChange={(e) => setFormData({...formData, destinationUrl: e.target.value})} className="w-full px-4 py-2.5 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 transition" required />
+                  <input type="text" value={formData.destinationUrl} onChange={(e) => setFormData({ ...formData, destinationUrl: e.target.value })} className="w-full px-4 py-2.5 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 transition" required />
                 </div>
                 <div className="flex gap-3 pt-4">
                   <button type="button" onClick={closeModal} className="flex-1 bg-slate-100 py-3 rounded-xl font-medium hover:bg-slate-200 transition">Cancel</button>
@@ -225,7 +223,7 @@ const CategoryManagement = () => {
           </div>
         )}
 
-        {/* Custom Delete Confirmation Modal */}
+
         {isDeleteModalOpen && (
           <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[60] flex items-center justify-center p-4">
             <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="bg-white rounded-3xl shadow-2xl w-full max-w-sm p-8 text-center space-y-4">
@@ -246,7 +244,7 @@ const CategoryManagement = () => {
           </div>
         )}
 
-        {/* Success Feedback Toast */}
+
         {showSuccess && (
           <motion.div initial={{ y: 50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 50, opacity: 0 }} className="fixed bottom-10 left-1/2 -translate-x-1/2 z-[70] bg-slate-900 text-white px-6 py-4 rounded-2xl flex items-center gap-3 shadow-2xl">
             <CheckCircle2 className="text-green-400" size={20} />

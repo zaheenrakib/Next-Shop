@@ -18,7 +18,7 @@ export default function HeroBanner() {
   useEffect(() => {
     const fetchHeroData = async () => {
       try {
-        // স্লাইডার এবং সাইডবার ডাটা একসাথে ফেচ করা
+
         const [sliderRes, sidebarRes] = await Promise.all([
           fetch('/api/hero/slider'),
           fetch('/api/hero/side-bar')
@@ -27,7 +27,7 @@ export default function HeroBanner() {
         const sliderData = await sliderRes.json();
         const sidebarData = await sidebarRes.json();
 
-        // শুধুমাত্র একটিভ (isActive: true) ডাটাগুলো ফিল্টার করে রাখা
+
         setSliders(Array.isArray(sliderData) ? sliderData.filter((s: any) => s.isActive !== false) : []);
         setSidebars(Array.isArray(sidebarData) ? sidebarData.filter((s: any) => s.isActive !== false) : []);
       } catch (err) {
@@ -57,15 +57,15 @@ export default function HeroBanner() {
   return (
     <section className="container mx-auto px-4 py-6 mt-12">
       <div className="flex flex-col lg:flex-row gap-5">
-        
-        {/* --- Main Slider Section --- */}
+
+
         <div className="lg:w-3/4 w-full h-[250px] md:h-[450px] rounded-2xl overflow-hidden shadow-sm border border-gray-100 relative group">
           {sliders.length > 0 ? (
-            <Swiper 
-              modules={[Pagination, Autoplay, Navigation]} 
-              pagination={{ clickable: true }} 
-              autoplay={{ delay: 5000 }} 
-              loop={sliders.length > 1} 
+            <Swiper
+              modules={[Pagination, Autoplay, Navigation]}
+              pagination={{ clickable: true }}
+              autoplay={{ delay: 5000 }}
+              loop={sliders.length > 1}
               className="w-full h-full"
             >
               {sliders.map((slide) => (
@@ -101,24 +101,24 @@ export default function HeroBanner() {
           )}
         </div>
 
-        {/* --- Side Promotions Section --- */}
+
         <div className="lg:w-1/4 w-full flex flex-col gap-3">
           {sidebars.slice(0, 2).map((promo) => (
-            <Link 
-              key={promo.id} 
-              href={promo.targetUrl || "#"} 
+            <Link
+              key={promo.id}
+              href={promo.targetUrl || "#"}
               className="flex-1 rounded-3xl overflow-hidden border border-gray-100 transition-transform hover:scale-[1.02] duration-300 relative group"
             >
-              <img 
-                src={promo.imageUrl} 
-                className="w-full h-full object-cover" 
-                alt="Promotion" 
+              <img
+                src={promo.imageUrl}
+                className="w-full h-full object-cover"
+                alt="Promotion"
               />
               <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors" />
             </Link>
           ))}
-          
-          {/* যদি সাইডবার ডাটা ১টা থাকে বা না থাকে, তবে একটি ফাকা বা ডিফল্ট ডিজাইন দেখাতে পারেন */}
+
+
           {sidebars.length === 0 && (
             <div className="flex-1 rounded-3xl bg-gray-50 border border-dashed border-gray-200 flex items-center justify-center text-gray-300 text-xs">
               Ad Space Available

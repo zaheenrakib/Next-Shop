@@ -18,8 +18,8 @@ export default function ProductsPage() {
   const [attributes, setAttributes] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  
-  // Filter States
+
+
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [selectedAttrValues, setSelectedAttrValues] = useState<string[]>([]);
@@ -40,8 +40,8 @@ export default function ProductsPage() {
     ]);
     setCategories(await catRes.json());
     setBrands(await brandRes.json());
-    
-    // Group attribute values by attribute
+
+
     const allValues = await attrRes.json();
     const grouped: any[] = [];
     allValues.forEach((val: any) => {
@@ -61,7 +61,7 @@ export default function ProductsPage() {
       let url = `/api/products?search=${searchQuery}`;
       if (selectedCategory) url += `&category=${selectedCategory}`;
       if (selectedBrands.length > 0) url += `&brand=${selectedBrands.join(',')}`;
-      
+
       const res = await fetch(url);
       const data = await res.json();
       setProducts(data.products);
@@ -73,7 +73,7 @@ export default function ProductsPage() {
   };
 
   const toggleBrand = (brandId: string) => {
-    setSelectedBrands(prev => 
+    setSelectedBrands(prev =>
       prev.includes(brandId) ? prev.filter(id => id !== brandId) : [...prev, brandId]
     );
   };
@@ -81,7 +81,7 @@ export default function ProductsPage() {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      
+
       <main className="container mx-auto px-4 py-10">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10">
           <div>
@@ -91,8 +91,8 @@ export default function ProductsPage() {
 
           <div className="relative w-full md:w-96 group">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
-            <Input 
-              placeholder="Search products..." 
+            <Input
+              placeholder="Search products..."
               className="pl-10 h-12 glass border-none focus-visible:ring-2 focus-visible:ring-primary shadow-sm"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -101,22 +101,22 @@ export default function ProductsPage() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-10">
-          {/* Sidebar Filters */}
+
           <aside className="lg:col-span-1 space-y-8">
             <Card className="border-none shadow-xl glass overflow-hidden">
               <CardContent className="p-6 space-y-8">
-                {/* Categories */}
+
                 <div className="space-y-4">
                   <h3 className="font-bold text-lg flex items-center gap-2"><Filter className="w-4 h-4" /> Categories</h3>
                   <div className="space-y-2">
-                    <button 
+                    <button
                       onClick={() => setSelectedCategory(null)}
                       className={`w-full text-left px-3 py-2 rounded-lg transition-all text-sm font-medium flex justify-between items-center ${!selectedCategory ? 'bg-primary text-white' : 'hover:bg-muted'}`}
                     >
                       All Categories <ChevronRight className="w-4 h-4" />
                     </button>
                     {categories.map(cat => (
-                      <button 
+                      <button
                         key={cat.id}
                         onClick={() => setSelectedCategory(cat.id)}
                         className={`w-full text-left px-3 py-2 rounded-lg transition-all text-sm font-medium flex justify-between items-center ${selectedCategory === cat.id ? 'bg-primary text-white' : 'hover:bg-muted'}`}
@@ -127,7 +127,7 @@ export default function ProductsPage() {
                   </div>
                 </div>
 
-                {/* Brands */}
+
                 <div className="space-y-4">
                   <h3 className="font-bold text-lg">Brands</h3>
                   <div className="space-y-3">
@@ -142,7 +142,7 @@ export default function ProductsPage() {
                   </div>
                 </div>
 
-                {/* Attributes */}
+
                 <Accordion type="multiple" className="w-full">
                   {attributes.map(attr => (
                     <AccordionItem key={attr.id} value={attr.id} className="border-none">
@@ -172,7 +172,7 @@ export default function ProductsPage() {
             </Card>
           </aside>
 
-          {/* Product Grid */}
+
           <div className="lg:col-span-3">
             {loading ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">

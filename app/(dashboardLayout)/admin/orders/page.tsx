@@ -12,7 +12,7 @@ export default function AdminOrdersPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState("ALL");
 
-  // Modal State
+
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -67,7 +67,7 @@ export default function AdminOrdersPage() {
   return (
     <div className="p-6 bg-white min-h-screen font-sans">
       <div className="max-w-7xl mx-auto">
-        {/* Header Section */}
+
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Order Management</h1>
@@ -78,7 +78,7 @@ export default function AdminOrdersPage() {
           </button>
         </div>
 
-        {/* Filters Section */}
+
         <div className="flex flex-col md:flex-row gap-4 mb-6">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
@@ -96,8 +96,8 @@ export default function AdminOrdersPage() {
                 key={status}
                 onClick={() => setFilterStatus(status)}
                 className={`px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${filterStatus === status
-                    ? "bg-orange-600 text-white shadow-md shadow-orange-100"
-                    : "bg-gray-50 text-gray-500 border border-gray-100 hover:bg-gray-100"
+                  ? "bg-orange-600 text-white shadow-md shadow-orange-100"
+                  : "bg-gray-50 text-gray-500 border border-gray-100 hover:bg-gray-100"
                   }`}
               >
                 {status}
@@ -106,7 +106,7 @@ export default function AdminOrdersPage() {
           </div>
         </div>
 
-        {/* --- MAIN ORDER TABLE --- */}
+
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left">
@@ -130,7 +130,7 @@ export default function AdminOrdersPage() {
                       <div className="font-bold text-gray-900 leading-none mb-1">{order.customerName}</div>
                       <div className="text-[11px] text-gray-400 font-medium">{order.phone}</div>
                     </td>
-                    {/* Items Column: Displaying Product Names */}
+
                     <td className="px-6 py-5">
                       <div className="text-sm font-semibold text-gray-700 truncate max-w-[200px]">
                         {order.items?.map((item: any) => item.name).join(", ")}
@@ -186,11 +186,11 @@ export default function AdminOrdersPage() {
         </div>
       </div>
 
-      {/* --- PREMIUM ORDER DETAIL MODAL --- */}
+
       {isModalOpen && selectedOrder && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
-            {/* Modal Header */}
+
             <div className="flex items-center justify-between p-6 border-b border-gray-100">
               <div>
                 <h2 className="text-xl font-bold text-gray-900">Order <span className="text-orange-600">#{selectedOrder.orderId}</span></h2>

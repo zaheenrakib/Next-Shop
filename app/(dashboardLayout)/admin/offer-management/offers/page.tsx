@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
-import { 
-  Save, Image as ImageIcon, Calendar, Tag, MapPin, 
-  Globe, Info, Percent, Truck, CreditCard, ListChecks, Plus, Trash2, Layout, Loader2 
+import {
+  Save, Image as ImageIcon, Calendar, Tag, MapPin,
+  Globe, Info, Percent, Truck, CreditCard, ListChecks, Plus, Trash2, Layout, Loader2
 } from "lucide-react";
 import { createOfferAction } from "@/services/offerService";
 
@@ -57,7 +57,7 @@ const DetailedOfferForm = () => {
 
   return (
     <div className="max-w-5xl mx-auto space-y-10 pb-20 px-4 pt-10">
-      {/* Header */}
+
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end border-b border-gray-200 pb-6 gap-4">
         <div>
           <h1 className="text-3xl font-black text-[#111827] tracking-tight">
@@ -67,7 +67,7 @@ const DetailedOfferForm = () => {
             <Layout size={16} /> Production Mode v2.1
           </p>
         </div>
-        <button 
+        <button
           onClick={handleFinalSubmit}
           disabled={loading}
           className="flex items-center gap-2 bg-black text-white px-8 py-4 rounded-2xl font-bold shadow-xl  hover:bg-gray-900 disabled:bg-gray-400 transition-all active:scale-95"
@@ -79,49 +79,49 @@ const DetailedOfferForm = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         <div className="lg:col-span-8 space-y-8">
-          {/* Appearance Section */}
+
           <section className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm space-y-6">
             <h2 className="text-lg font-bold flex items-center gap-2 text-[#111827]">
               <ImageIcon size={20} className="text-[#FF5722]" /> Basic Appearance
             </h2>
             <div className="grid grid-cols-1 gap-5">
-              <input 
-                type="text" 
-                placeholder="Main Banner Title" 
+              <input
+                type="text"
+                placeholder="Main Banner Title"
                 className="w-full px-4 py-4 bg-gray-50 border border-gray-200 rounded-2xl outline-none focus:border-[#FF5722]"
-                onChange={(e) => setBasicInfo({...basicInfo, mainTitle: e.target.value})}
+                onChange={(e) => setBasicInfo({ ...basicInfo, mainTitle: e.target.value })}
               />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <input 
-                  type="text" 
-                  placeholder="Catchy Sub-headline" 
+                <input
+                  type="text"
+                  placeholder="Catchy Sub-headline"
                   className="w-full px-4 py-4 bg-gray-50 border border-gray-200 rounded-2xl outline-none focus:border-[#FF5722]"
-                  onChange={(e) => setBasicInfo({...basicInfo, subHeadline: e.target.value})}
+                  onChange={(e) => setBasicInfo({ ...basicInfo, subHeadline: e.target.value })}
                 />
-                <input 
-                  type="text" 
-                  placeholder="Banner Image URL" 
+                <input
+                  type="text"
+                  placeholder="Banner Image URL"
                   className="w-full px-4 py-4 bg-gray-50 border border-gray-200 rounded-2xl outline-none focus:border-[#FF5722]"
-                  onChange={(e) => setBasicInfo({...basicInfo, imageUrl: e.target.value})}
+                  onChange={(e) => setBasicInfo({ ...basicInfo, imageUrl: e.target.value })}
                 />
               </div>
             </div>
           </section>
 
-          {/* Rewards Section */}
+
           <section className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm space-y-6">
             <h2 className="text-lg font-bold flex items-center gap-2 text-[#111827]">
               <Percent size={20} className="text-[#FF5722]" /> Rewards & Discounts
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <input placeholder="EMI Advantage" className="w-full px-4 py-4 bg-gray-50 border border-gray-200 rounded-2xl outline-none focus:border-[#FF5722]" onChange={(e) => setRewards({...rewards, emiAdvantage: e.target.value})}/>
-                <input placeholder="Coupon Code" className="w-full px-4 py-4 bg-gray-50 border border-gray-200 rounded-2xl outline-none focus:border-[#FF5722] font-mono font-bold" onChange={(e) => setRewards({...rewards, couponCode: e.target.value.toUpperCase()})}/>
-                <input placeholder="Shipping Deal" className="w-full px-4 py-4 bg-gray-50 border border-gray-200 rounded-2xl outline-none focus:border-[#FF5722]" onChange={(e) => setRewards({...rewards, shippingDeal: e.target.value})}/>
-                <input placeholder="Max Cashback" className="w-full px-4 py-4 bg-gray-50 border border-gray-200 rounded-2xl outline-none focus:border-[#FF5722]" onChange={(e) => setRewards({...rewards, maxCashback: e.target.value})}/>
+              <input placeholder="EMI Advantage" className="w-full px-4 py-4 bg-gray-50 border border-gray-200 rounded-2xl outline-none focus:border-[#FF5722]" onChange={(e) => setRewards({ ...rewards, emiAdvantage: e.target.value })} />
+              <input placeholder="Coupon Code" className="w-full px-4 py-4 bg-gray-50 border border-gray-200 rounded-2xl outline-none focus:border-[#FF5722] font-mono font-bold" onChange={(e) => setRewards({ ...rewards, couponCode: e.target.value.toUpperCase() })} />
+              <input placeholder="Shipping Deal" className="w-full px-4 py-4 bg-gray-50 border border-gray-200 rounded-2xl outline-none focus:border-[#FF5722]" onChange={(e) => setRewards({ ...rewards, shippingDeal: e.target.value })} />
+              <input placeholder="Max Cashback" className="w-full px-4 py-4 bg-gray-50 border border-gray-200 rounded-2xl outline-none focus:border-[#FF5722]" onChange={(e) => setRewards({ ...rewards, maxCashback: e.target.value })} />
             </div>
           </section>
 
-          {/* Terms Section */}
+
           <section className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm space-y-6">
             <div className="flex justify-between items-center">
               <h2 className="text-lg font-bold flex items-center gap-2 text-[#111827]">
@@ -133,15 +133,15 @@ const DetailedOfferForm = () => {
             </div>
             {terms.map((term, index) => (
               <div key={index} className="flex gap-3">
-                <input 
-                   value={term} 
-                   onChange={(e) => {
-                     const newTerms = [...terms];
-                     newTerms[index] = e.target.value;
-                     setTerms(newTerms);
-                   }}
-                   placeholder={`Condition #${index + 1}`}
-                   className="flex-1 px-4 py-4 bg-gray-50 border border-gray-200 rounded-2xl outline-none focus:border-[#FF5722]"
+                <input
+                  value={term}
+                  onChange={(e) => {
+                    const newTerms = [...terms];
+                    newTerms[index] = e.target.value;
+                    setTerms(newTerms);
+                  }}
+                  placeholder={`Condition #${index + 1}`}
+                  className="flex-1 px-4 py-4 bg-gray-50 border border-gray-200 rounded-2xl outline-none focus:border-[#FF5722]"
                 />
                 {terms.length > 1 && (
                   <button onClick={() => setTerms(terms.filter((_, i) => i !== index))} className="p-3 text-red-400 hover:bg-red-50 rounded-xl transition-all">
@@ -153,7 +153,7 @@ const DetailedOfferForm = () => {
           </section>
         </div>
 
-        {/* Sidebar */}
+
         <div className="lg:col-span-4 space-y-6">
           <div className="bg-[#111827] p-8 rounded-[2.5rem] text-white sticky top-10">
             <div className="space-y-6">
@@ -164,27 +164,27 @@ const DetailedOfferForm = () => {
                     <button
                       key={type}
                       className={`flex-1 py-3 rounded-xl text-[13px] font-bold ${basicInfo.availability === type ? "text-[#FF5722]" : "text-gray-400"}`}
-                      onClick={() => setBasicInfo({...basicInfo, availability: type})}
+                      onClick={() => setBasicInfo({ ...basicInfo, availability: type })}
                     >
                       {type}
                     </button>
                   ))}
                 </div>
               </div>
-              <input 
-                type="date" 
+              <input
+                type="date"
                 className="w-full px-4 py-4 bg-white/5 border border-white/10 rounded-2xl text-sm outline-none"
-                onChange={(e) => setBasicInfo({...basicInfo, startDate: e.target.value})}
+                onChange={(e) => setBasicInfo({ ...basicInfo, startDate: e.target.value })}
               />
-              <input 
-                type="date" 
+              <input
+                type="date"
                 className="w-full px-4 py-4 bg-white/5 border border-white/10 rounded-2xl text-sm outline-none"
-                onChange={(e) => setBasicInfo({...basicInfo, endDate: e.target.value})}
+                onChange={(e) => setBasicInfo({ ...basicInfo, endDate: e.target.value })}
               />
               <div className="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5">
                 <span className="text-sm font-bold">Status: {basicInfo.status}</span>
-                <button 
-                  onClick={() => setBasicInfo(prev => ({...prev, status: prev.status === "Published" ? "Draft" : "Published"}))}
+                <button
+                  onClick={() => setBasicInfo(prev => ({ ...prev, status: prev.status === "Published" ? "Draft" : "Published" }))}
                   className={`w-12 h-6 rounded-full transition-all ${basicInfo.status === "Published" ? "bg-green-500" : "bg-gray-700"}`}
                 >
                   <div className={`w-4 h-4 bg-white rounded-full transition-all ${basicInfo.status === "Published" ? "ml-7" : "ml-1"}`} />

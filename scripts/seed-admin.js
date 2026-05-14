@@ -9,10 +9,10 @@ async function seedAdmin() {
   try {
     await client.connect();
     const db = client.db(process.env.DB_NAME || 'ecommerce_db');
-    
-    // Check if admin exists
+
+
     const existingAdmin = await db.collection('users').findOne({ phone: '+8801234567890' });
-    
+
     if (existingAdmin) {
       console.log('✓ Admin user already exists');
       console.log('Phone: +8801234567890');
@@ -20,7 +20,7 @@ async function seedAdmin() {
       return;
     }
 
-    // Create admin user
+
     const hashedPassword = await bcrypt.hash('admin123', 10);
     const admin = {
       id: uuidv4(),
@@ -32,7 +32,7 @@ async function seedAdmin() {
     };
 
     await db.collection('users').insertOne(admin);
-    
+
     console.log('✓ Admin user created successfully!');
     console.log('----------------------------------');
     console.log('Phone: +8801234567890');

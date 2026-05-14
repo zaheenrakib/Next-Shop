@@ -17,13 +17,13 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
 export async function PUT(req: Request, { params }: { params: { id: string } }) {
   try {
     const body = await req.json();
-    
-    // মডাল থেকে যেহেতু { product: ..., variants: ... } পাঠানো হচ্ছে
-    // তাই বডি থেকে product অংশটুকু আলাদা করে সার্ভিস ফাংশনে পাঠাতে হবে
-    const productData = body.product; 
+
+
+
+    const productData = body.product;
 
     if (!productData) {
-       return NextResponse.json({ error: "No product data provided" }, { status: 400 });
+      return NextResponse.json({ error: "No product data provided" }, { status: 400 });
     }
 
     const updatedProduct = await updateProduct(params.id, productData);
@@ -36,7 +36,7 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
 
 export async function DELETE(req: Request, { params }: { params: { id: string } }) {
   try {
-    // Cascade delete handling
+
     await prisma.$transaction([
       prisma.productSpecification.deleteMany({ where: { productId: params.id } }),
       prisma.variant.deleteMany({ where: { productId: params.id } }),

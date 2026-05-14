@@ -83,17 +83,17 @@ export default function AttributeManagement() {
   return (
     <div className="p-6 space-y-6">
       <h1 className="text-3xl font-bold">Attribute Management</h1>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Attributes List */}
+
         <Card>
           <CardHeader>
             <CardTitle>Attributes</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex gap-2">
-              <Input 
-                placeholder="New Attribute (e.g. RAM)" 
+              <Input
+                placeholder="New Attribute (e.g. RAM)"
                 value={newAttribute}
                 onChange={(e) => setNewAttribute(e.target.value)}
               />
@@ -101,7 +101,7 @@ export default function AttributeManagement() {
                 {loading ? <Loader2 className="animate-spin" /> : <Plus className="w-4 h-4" />}
               </Button>
             </div>
-            
+
             <Table>
               <TableHeader>
                 <TableRow>
@@ -111,8 +111,8 @@ export default function AttributeManagement() {
               </TableHeader>
               <TableBody>
                 {attributes.map((attr) => (
-                  <TableRow 
-                    key={attr.id} 
+                  <TableRow
+                    key={attr.id}
                     className={`cursor-pointer ${selectedAttr?.id === attr.id ? 'bg-muted' : ''}`}
                     onClick={() => setSelectedAttr(attr)}
                   >
@@ -127,7 +127,7 @@ export default function AttributeManagement() {
           </CardContent>
         </Card>
 
-        {/* Attribute Values */}
+
         {selectedAttr && (
           <Card>
             <CardHeader>
@@ -135,8 +135,8 @@ export default function AttributeManagement() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex gap-2">
-                <Input 
-                  placeholder="New Value (e.g. 8GB)" 
+                <Input
+                  placeholder="New Value (e.g. 8GB)"
                   value={newValue}
                   onChange={(e) => setNewValue(e.target.value)}
                 />
@@ -144,7 +144,7 @@ export default function AttributeManagement() {
                   {loading ? <Loader2 className="animate-spin" /> : <Plus className="w-4 h-4" />}
                 </Button>
               </div>
-              
+
               <Table>
                 <TableHeader>
                   <TableRow>

@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('Starting seed...');
 
-  // 1. Clear existing data
+
   await prisma.variantAttribute.deleteMany();
   await prisma.variant.deleteMany();
   await prisma.productSpecification.deleteMany();
@@ -16,18 +16,18 @@ async function main() {
   await prisma.category.deleteMany();
   await prisma.brand.deleteMany();
 
-  // 2. Create Brands
+
   const apple = await prisma.brand.create({ data: { name: 'Apple' } });
   const samsung = await prisma.brand.create({ data: { name: 'Samsung' } });
   const lg = await prisma.brand.create({ data: { name: 'LG' } });
   const dell = await prisma.brand.create({ data: { name: 'Dell' } });
 
-  // 3. Create Categories
+
   const mobileCat = await prisma.category.create({ data: { name: 'Mobile' } });
   const laptopCat = await prisma.category.create({ data: { name: 'Laptop' } });
   const washingMachineCat = await prisma.category.create({ data: { name: 'Washing Machine' } });
 
-  // 4. Create Attributes
+
   const ramAttr = await prisma.attribute.create({ data: { name: 'RAM', type: 'select' } });
   const storageAttr = await prisma.attribute.create({ data: { name: 'Storage', type: 'select' } });
   const colorAttr = await prisma.attribute.create({ data: { name: 'Color', type: 'select' } });
@@ -36,7 +36,7 @@ async function main() {
   const capacityAttr = await prisma.attribute.create({ data: { name: 'Capacity', type: 'number' } });
   const loadTypeAttr = await prisma.attribute.create({ data: { name: 'Load Type', type: 'select' } });
 
-  // 5. Create Attribute Values
+
   await prisma.attributeValue.createMany({
     data: [
       { attributeId: ramAttr.id, value: '8GB' },
@@ -53,27 +53,27 @@ async function main() {
     ],
   });
 
-  // 6. Link Attributes to Categories
+
   await prisma.categoryAttribute.createMany({
     data: [
-      // Mobile
+
       { categoryId: mobileCat.id, attributeId: ramAttr.id },
       { categoryId: mobileCat.id, attributeId: storageAttr.id },
       { categoryId: mobileCat.id, attributeId: colorAttr.id },
       { categoryId: mobileCat.id, attributeId: batteryAttr.id },
-      // Laptop
+
       { categoryId: laptopCat.id, attributeId: ramAttr.id },
       { categoryId: laptopCat.id, attributeId: storageAttr.id },
       { categoryId: laptopCat.id, attributeId: cpuAttr.id },
-      // Washing Machine
+
       { categoryId: washingMachineCat.id, attributeId: capacityAttr.id },
       { categoryId: washingMachineCat.id, attributeId: loadTypeAttr.id },
     ],
   });
 
-  // 7. Create Demo Products
-  
-  // -- iPhone 15 Pro --
+
+
+
   const iphone = await prisma.product.create({
     data: {
       name: 'iPhone 15 Pro',
@@ -90,7 +90,7 @@ async function main() {
     },
   });
 
-  // Fetch created values for variants
+
   const ram8gb = await prisma.attributeValue.findFirst({ where: { value: '8GB', attributeId: ramAttr.id } });
   const storage256gb = await prisma.attributeValue.findFirst({ where: { value: '256GB', attributeId: storageAttr.id } });
   const storage512gb = await prisma.attributeValue.findFirst({ where: { value: '512GB', attributeId: storageAttr.id } });
@@ -113,7 +113,7 @@ async function main() {
     });
   }
 
-  // -- Dell XPS 15 --
+
   const dellXps = await prisma.product.create({
     data: {
       name: 'Dell XPS 15',
@@ -130,7 +130,7 @@ async function main() {
     },
   });
 
-  // -- Samsung Front Load Washer --
+
   const samsungWasher = await prisma.product.create({
     data: {
       name: 'Samsung 9kg Front Load',

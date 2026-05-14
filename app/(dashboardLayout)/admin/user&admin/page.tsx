@@ -2,7 +2,7 @@ import prisma from "@/lib/prisma";
 import { User, Mail, Phone, Search, Trash2, ShieldAlert, ShieldCheck, UserCog } from "lucide-react";
 import { revalidatePath } from "next/cache";
 
-// --- সার্ভার অ্যাকশনগুলো এখানে ---
+
 async function deleteUser(userId: string) {
   "use server";
   try {
@@ -27,7 +27,7 @@ async function toggleRole(userId: string, currentRole: string) {
   }
 }
 
-// --- মেইন পেজ কম্পোনেন্ট ---
+
 export default async function AdminUserList({
   searchParams,
 }: {
@@ -48,8 +48,8 @@ export default async function AdminUserList({
   return (
     <div className="p-8 bg-slate-50 min-h-screen font-sans text-slate-900">
       <div className="max-w-6xl mx-auto">
-        
-        {/* Header & Search */}
+
+
         <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-6 mb-10">
           <div>
             <h1 className="text-3xl font-black text-slate-900 italic uppercase tracking-tighter flex items-center gap-3">
@@ -61,7 +61,7 @@ export default async function AdminUserList({
           <div className="flex items-center gap-4">
             <form className="relative group">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors" size={18} />
-              <input 
+              <input
                 type="text"
                 name="q"
                 defaultValue={query}
@@ -75,7 +75,7 @@ export default async function AdminUserList({
           </div>
         </div>
 
-        {/* Table Container */}
+
         <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-2xl shadow-slate-200/50 overflow-hidden">
           <table className="w-full text-left border-collapse">
             <thead>
@@ -91,10 +91,9 @@ export default async function AdminUserList({
                 <tr key={user.id} className="hover:bg-blue-50/30 transition-all group">
                   <td className="p-6">
                     <div className="flex items-center gap-4">
-                      <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black text-lg transition-transform group-hover:scale-110 ${
-                        user.role === 'ADMIN' ? 'bg-orange-500 text-white rotate-3 shadow-orange-200' : 'bg-blue-600 text-white -rotate-3 shadow-blue-200'
-                      } shadow-lg`}>
-                        {user.name?.charAt(0).toUpperCase() || <User size={20}/>}
+                      <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black text-lg transition-transform group-hover:scale-110 ${user.role === 'ADMIN' ? 'bg-orange-500 text-white rotate-3 shadow-orange-200' : 'bg-blue-600 text-white -rotate-3 shadow-blue-200'
+                        } shadow-lg`}>
+                        {user.name?.charAt(0).toUpperCase() || <User size={20} />}
                       </div>
                       <div>
                         <div className="font-bold text-slate-800 text-base">{user.name}</div>
@@ -119,34 +118,32 @@ export default async function AdminUserList({
                   </td>
 
                   <td className="p-6">
-                    <span className={`px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest border-2 ${
-                      user.role === 'ADMIN' 
-                      ? 'bg-orange-50 text-orange-600 border-orange-100' 
+                    <span className={`px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest border-2 ${user.role === 'ADMIN'
+                      ? 'bg-orange-50 text-orange-600 border-orange-100'
                       : 'bg-blue-50 text-blue-600 border-blue-100'
-                    }`}>
+                      }`}>
                       {user.role}
                     </span>
                   </td>
 
                   <td className="p-6 text-right">
                     <div className="flex justify-end gap-3">
-                      {/* Role Toggle Form */}
+
                       <form action={async () => { "use server"; await toggleRole(user.id, user.role); }}>
-                        <button className={`p-3 rounded-2xl transition-all shadow-sm border ${
-                          user.role === 'ADMIN' 
-                          ? 'bg-orange-500 text-white border-orange-400 hover:bg-orange-600' 
+                        <button className={`p-3 rounded-2xl transition-all shadow-sm border ${user.role === 'ADMIN'
+                          ? 'bg-orange-500 text-white border-orange-400 hover:bg-orange-600'
                           : 'bg-white text-slate-400 border-slate-100 hover:border-blue-200 hover:text-blue-600'
-                        }`}>
+                          }`}>
                           {user.role === 'ADMIN' ? <ShieldCheck size={18} /> : <ShieldAlert size={18} />}
                         </button>
                       </form>
 
-                      {/* Delete User Form */}
-                      <form 
+
+                      <form
                         action={async () => { "use server"; await deleteUser(user.id); }}
-                        // আমরা এখানে জাভাস্ক্রিপ্ট confirm এর বদলে সরাসরি ফর্ম সাবমিশন ব্যবহার করছি এরর এড়াতে
+
                       >
-                        <button 
+                        <button
                           type="submit"
                           className="p-3 bg-white text-slate-400 border border-slate-100 rounded-2xl hover:bg-red-50 hover:text-red-500 hover:border-red-100 transition-all shadow-sm"
                         >
@@ -159,7 +156,7 @@ export default async function AdminUserList({
               ))}
             </tbody>
           </table>
-          
+
           {users.length === 0 && (
             <div className="p-24 text-center">
               <Search size={40} className="mx-auto text-slate-200 mb-4" />

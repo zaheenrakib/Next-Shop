@@ -29,12 +29,12 @@ export function verifyToken(token: string): any {
   }
 }
 
-// Better Auth কনফিগারেশন
+
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
     provider: "mongodb",
   }),
   emailAndPassword: {
-    enabled: true, 
+    enabled: true,
   },
 });

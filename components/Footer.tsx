@@ -8,7 +8,7 @@ export default function Footer() {
     <footer className="bg-secondary text-white mt-20">
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          {/* Company Info */}
+
           <div>
             <h3 className="font-bold text-lg mb-4">NextBazaar</h3>
             <p className="text-gray-300 text-sm mb-4">
@@ -27,7 +27,7 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Quick Links */}
+
           <div>
             <h3 className="font-bold text-lg mb-4">Quick Links</h3>
             <ul className="space-y-2 text-sm text-gray-300">
@@ -38,7 +38,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Customer Service */}
+
           <div>
             <h3 className="font-bold text-lg mb-4">Customer Service</h3>
             <ul className="space-y-2 text-sm text-gray-300">
@@ -49,7 +49,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Contact */}
+
           <div>
             <h3 className="font-bold text-lg mb-4">Contact Us</h3>
             <ul className="space-y-3 text-sm text-gray-300">

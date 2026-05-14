@@ -30,7 +30,7 @@ export default function CheckoutPage() {
   const [cart, setCart] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
-  // useSession call
+
   const session = useSession();
 
   const [formData, setFormData] = useState({
@@ -66,17 +66,17 @@ export default function CheckoutPage() {
   const handleConfirmOrder = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Checking whether the user is logged in
-if (!session?.data?.user) {
-  toast.error('Please log in first to confirm the order');
-  router.push('/account/register');
-  return;
-}
 
-if (!formData.firstName || !formData.address || !formData.mobile || !formData.email) {
-  toast.error('Please provide all required (*) information');
-  return;
-}
+    if (!session?.data?.user) {
+      toast.error('Please log in first to confirm the order');
+      router.push('/account/register');
+      return;
+    }
+
+    if (!formData.firstName || !formData.address || !formData.mobile || !formData.email) {
+      toast.error('Please provide all required (*) information');
+      return;
+    }
 
     setLoading(true);
 
@@ -137,7 +137,7 @@ if (!formData.firstName || !formData.address || !formData.mobile || !formData.em
       setLoading(false);
     }
   };
-  
+
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -145,7 +145,7 @@ if (!formData.firstName || !formData.address || !formData.mobile || !formData.em
       <div className="container mx-auto px-4 py-24 md:py-32">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
 
-          {/* LEFT: FORM SECTION */}
+
           <div className="lg:col-span-7 space-y-6">
             <Card className="border-none shadow-sm rounded-xl bg-white overflow-hidden">
               <div className="p-6 border-b flex items-center gap-2">
@@ -232,7 +232,7 @@ if (!formData.firstName || !formData.address || !formData.mobile || !formData.em
             </Card>
           </div>
 
-          {/* RIGHT: ORDER SUMMARY */}
+
           <div className="lg:col-span-5">
             <Card className="border-none shadow-sm rounded-xl bg-white overflow-hidden sticky top-28">
               <div className="p-6 border-b bg-slate-50">

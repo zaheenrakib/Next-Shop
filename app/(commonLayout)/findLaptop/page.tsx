@@ -19,14 +19,14 @@ export default function FindLaptopPage() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // তোমার ডাটাবেসের ল্যাপটপ ক্যাটাগরি আইডি এখানে দিচ্ছি
+
   const laptopCategoryId = "69fb279db553f59b0fa4a617";
 
   useEffect(() => {
     const fetchLaptops = async () => {
       setLoading(true);
       try {
-        // search=laptop বাদ দিয়ে সরাসরি ক্যাটাগরি আইডি দিয়ে ফিল্টার করছি
+
         const res = await fetch(`/api/products?maxPrice=${selectedBudget}&category=${laptopCategoryId}`);
         const data = await res.json();
         setProducts(data.products || []);
@@ -50,35 +50,33 @@ export default function FindLaptopPage() {
             Find Your <span className="text-[#FF4D30]">Perfect</span> Laptop
           </h1>
           <p className="text-slate-500 text-lg font-medium">
-  Select your budget range to discover the best-performing laptops tailored for you.
-</p>
+            Select your budget range to discover the best-performing laptops tailored for you.
+          </p>
         </div>
 
 
-        {/* Budget Picker */}
+
         <div className="flex flex-wrap justify-center gap-4 mb-16">
           {budgets.map((b) => (
             <button
-  key={b.value}
-  onClick={() => setSelectedBudget(b.value)}
-  className={`px-8 py-4 rounded-2xl font-bold transition-all duration-500 flex items-center gap-3 border-2 tracking-tight ${
-    selectedBudget === b.value
-      ? "bg-[#FF4D30] border-[#FF4D30] text-white shadow-[0_10px_25px_-5px_rgba(255,77,48,0.4)] scale-105"
-      : "bg-white border-slate-100 text-slate-500 hover:border-[#FF4D30]/30 hover:text-[#FF4D30]"
-  }`}
->
-  <Banknote 
-    size={20} 
-    className={`transition-colors duration-300 ${
-      selectedBudget === b.value ? "text-white" : "text-slate-400"
-    }`} 
-  />
-  {b.label}
-</button>
+              key={b.value}
+              onClick={() => setSelectedBudget(b.value)}
+              className={`px-8 py-4 rounded-2xl font-bold transition-all duration-500 flex items-center gap-3 border-2 tracking-tight ${selectedBudget === b.value
+                ? "bg-[#FF4D30] border-[#FF4D30] text-white shadow-[0_10px_25px_-5px_rgba(255,77,48,0.4)] scale-105"
+                : "bg-white border-slate-100 text-slate-500 hover:border-[#FF4D30]/30 hover:text-[#FF4D30]"
+                }`}
+            >
+              <Banknote
+                size={20}
+                className={`transition-colors duration-300 ${selectedBudget === b.value ? "text-white" : "text-slate-400"
+                  }`}
+              />
+              {b.label}
+            </button>
           ))}
         </div>
 
-        {/* Loading / Results Grid */}
+
         {loading ? (
           <div className="flex justify-center py-20">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>

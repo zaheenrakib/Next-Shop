@@ -20,7 +20,7 @@ import {
 import ProductModal from "@/components/admin/ProductModal";
 import { toast } from "react-hot-toast";
 
-// Types
+
 interface Product {
   id: string;
   name: string;
@@ -52,7 +52,7 @@ export default function AdminProductsPage() {
 
   const itemsPerPage = 10;
 
-  // Sample categories and brands (replace with API data)
+
   const categories = [
     { id: "mobile", name: "Mobile" },
     { id: "laptop", name: "Laptop" },
@@ -66,7 +66,7 @@ export default function AdminProductsPage() {
     { id: "xiaomi", name: "Xiaomi" },
   ];
 
-  // Debounce search input
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(search);
@@ -175,7 +175,7 @@ export default function AdminProductsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
+
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Products</h1>
@@ -192,11 +192,11 @@ export default function AdminProductsPage() {
           </button>
         </div>
 
-        {/* Search and Filters Bar */}
+
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm mb-6">
           <div className="p-4">
             <div className="flex flex-col lg:flex-row lg:items-center gap-3">
-              {/* Search */}
+
               <div className="flex-1 relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
                 <input
@@ -208,7 +208,7 @@ export default function AdminProductsPage() {
                 />
               </div>
 
-              {/* Category Filter */}
+
               <div className="relative min-w-[140px]">
                 <select
                   value={categoryFilter}
@@ -226,7 +226,7 @@ export default function AdminProductsPage() {
                 <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
               </div>
 
-              {/* Brand Filter */}
+
               <div className="relative min-w-[140px]">
                 <select
                   value={brandFilter}
@@ -244,7 +244,7 @@ export default function AdminProductsPage() {
                 <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
               </div>
 
-              {/* View Toggle */}
+
               <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
                 <button
                   onClick={() => setViewMode("table")}
@@ -260,7 +260,7 @@ export default function AdminProductsPage() {
                 </button>
               </div>
 
-              {/* Clear Filters */}
+
               {hasActiveFilters && (
                 <button
                   onClick={clearFilters}
@@ -273,7 +273,7 @@ export default function AdminProductsPage() {
           </div>
         </div>
 
-        {/* Table View - Desktop */}
+
         {viewMode === "table" && (
           <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
             <div className="overflow-x-auto">
@@ -362,7 +362,7 @@ export default function AdminProductsPage() {
           </div>
         )}
 
-        {/* Grid View - Mobile/Tablet/Desktop optional */}
+
         {viewMode === "grid" && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {loading ? (
@@ -422,7 +422,7 @@ export default function AdminProductsPage() {
           </div>
         )}
 
-        {/* Pagination */}
+
         {totalPages > 1 && !loading && (
           <div className="flex items-center justify-between mt-6">
             <p className="text-sm text-gray-500 hidden sm:block">
@@ -452,11 +452,10 @@ export default function AdminProductsPage() {
                     <button
                       key={pageNum}
                       onClick={() => handlePageChange(pageNum)}
-                      className={`w-8 h-8 rounded-lg text-sm font-medium transition-all ${
-                        currentPage === pageNum
-                          ? "bg-blue-600 text-white"
-                          : "text-gray-600 hover:bg-gray-100"
-                      }`}
+                      className={`w-8 h-8 rounded-lg text-sm font-medium transition-all ${currentPage === pageNum
+                        ? "bg-blue-600 text-white"
+                        : "text-gray-600 hover:bg-gray-100"
+                        }`}
                     >
                       {pageNum}
                     </button>
@@ -475,7 +474,7 @@ export default function AdminProductsPage() {
         )}
       </div>
 
-      {/* Product Modal */}
+
       {isModalOpen && (
         <ProductModal
           product={selectedProduct}

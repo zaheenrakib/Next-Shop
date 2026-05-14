@@ -61,7 +61,7 @@ export const usePCBuilder = create<PCBuilderState>()(
           const newBuild = { ...state.build };
           newBuild.components[category].selectedProduct = product;
 
-          // Recalculate total price
+
           newBuild.totalPrice = Object.values(newBuild.components).reduce(
             (sum, comp) => sum + (comp.selectedProduct?.price || 0),
             0,
@@ -90,7 +90,7 @@ export const usePCBuilder = create<PCBuilderState>()(
       isCompatible: (category, product) => {
         const { build } = get();
 
-        // Basic Logic: Processor and Motherboard socket must match
+
         if (category === "Motherboard") {
           const processor = build.components["Processor"].selectedProduct;
           if (
@@ -117,13 +117,13 @@ export const usePCBuilder = create<PCBuilderState>()(
           }
         }
 
-        // RAM compatibility with Motherboard
+
         if (category === "RAM") {
           const motherboard = build.components["Motherboard"].selectedProduct;
           if (
             motherboard &&
             motherboard.compatibility?.ramType !==
-              product.compatibility?.ramType
+            product.compatibility?.ramType
           ) {
             return {
               compatible: false,

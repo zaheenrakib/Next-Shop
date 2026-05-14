@@ -28,7 +28,7 @@ export interface Product {
   status?: "In Stock" | "Out of Stock";
   averageRating?: number;
   keyFeatures?: string[];
-  // PC Builder specific fields
+
   compatibility?: {
     socket?: string;
     formFactor?: string;

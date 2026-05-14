@@ -1,5 +1,5 @@
 
-// @/services/heroSidebarService.ts
+
 import prisma from "@/lib/prisma";
 
 export const heroSidebarService = {
@@ -13,14 +13,14 @@ export const heroSidebarService = {
     const { id, ...data } = payload;
 
     if (id) {
-      // যদি ID থাকে তবে আপডেট করো
+
       return await prisma.heroSidebar.update({
         where: { id },
         data: data,
       });
     }
 
-    // ID না থাকলে নতুন ক্রিয়েট করো
+
     return await prisma.heroSidebar.create({
       data: {
         imageUrl: data.imageUrl,

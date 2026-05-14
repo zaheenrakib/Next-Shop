@@ -8,11 +8,11 @@ export async function GET(
   try {
     const { slug } = params;
 
-    // ক্যাটাগরি স্লাগ বা নাম দিয়ে প্রোডাক্ট খুঁজে বের করা
+
     const products = await prisma.product.findMany({
       where: {
         category: {
-          // স্লাগ যদি ছোট হাতের হয় (যেমন: mobile)
+
           name: {
             equals: slug.charAt(0).toUpperCase() + slug.slice(1), // Mobile হিসেবে সার্চ করবে
             mode: 'insensitive' // ক্যাপিটাল বা স্মল লেটার যাই হোক খুঁজে পাবে

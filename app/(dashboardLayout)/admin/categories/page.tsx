@@ -26,22 +26,22 @@ export default function CategoryManagement() {
   };
 
   const handleDelete = async (id: string) => {
-  setLoading(true);
-  try {
-    const res = await fetch(`/api/categories?id=${id}`, { method: 'DELETE' });
-    if (res.ok) {
-      toast.success('Category deleted successfully');
-      fetchCategories(); 
-    } else {
-      const error = await res.json();
-      toast.error(error.error || 'Failed to delete category');
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/categories?id=${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        toast.success('Category deleted successfully');
+        fetchCategories();
+      } else {
+        const error = await res.json();
+        toast.error(error.error || 'Failed to delete category');
+      }
+    } catch (error) {
+      toast.error('Failed to delete category');
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-    toast.error('Failed to delete category');
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   const handleAddCategory = async () => {
     if (!name) return;
@@ -49,9 +49,9 @@ export default function CategoryManagement() {
     try {
       const res = await fetch('/api/categories', {
         method: 'POST',
-        body: JSON.stringify({ 
-          name, 
-          parent: parent === 'none' ? null : parent 
+        body: JSON.stringify({
+          name,
+          parent: parent === 'none' ? null : parent
         }),
         headers: { 'Content-Type': 'application/json' }
       });
@@ -73,9 +73,9 @@ export default function CategoryManagement() {
       <h1 className="text-3xl font-bold flex items-center gap-2">
         <FolderTree /> Category Management
       </h1>
-      
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Add Category Form */}
+
         <Card className="lg:col-span-1">
           <CardHeader>
             <CardTitle>Add Category</CardTitle>
@@ -83,8 +83,8 @@ export default function CategoryManagement() {
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <label className="text-sm font-medium">Category Name</label>
-              <Input 
-                placeholder="e.g. Laptops" 
+              <Input
+                placeholder="e.g. Laptops"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
               />
@@ -112,7 +112,7 @@ export default function CategoryManagement() {
           </CardContent>
         </Card>
 
-        {/* Categories List */}
+
         <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle>All Categories</CardTitle>

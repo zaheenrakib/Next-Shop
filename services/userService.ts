@@ -2,7 +2,7 @@
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
-// ডিলিট অ্যাকশন
+
 export async function deleteUserAction(userId: string) {
     try {
         await prisma.user.delete({ where: { id: userId } });
@@ -13,7 +13,7 @@ export async function deleteUserAction(userId: string) {
     }
 }
 
-// রোল আপডেট অ্যাকশন (User <-> Admin)
+
 export async function toggleUserRoleAction(userId: string, currentRole: string) {
     try {
         const newRole = currentRole === "admin" ? "user" : "admin";

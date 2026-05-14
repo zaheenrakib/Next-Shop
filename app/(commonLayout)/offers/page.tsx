@@ -6,7 +6,7 @@ import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
-// Helper function for date formatting
+
 const formatDate = (date: any) => {
   if (!date) return "N/A";
   return new Intl.DateTimeFormat('en-GB', {
@@ -17,8 +17,8 @@ const formatDate = (date: any) => {
 };
 
 export default async function OffersPage() {
-  // ১. ডেটা ফেচিং (Status Check fixed)
-  // আপনার ড্যাশবোর্ডে যদি "Active" স্ট্যাটাস সেভ করেন, তবে এখানেও "Active" দিতে হবে।
+
+
   const offers = await prisma.offer.findMany({
     where: {
       OR: [
@@ -32,7 +32,7 @@ export default async function OffersPage() {
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
-      
+
       <main className="flex-grow bg-[#f2f4f8] py-10 px-4">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between mb-8 border-b border-gray-300 pb-4">
@@ -54,7 +54,7 @@ export default async function OffersPage() {
                   key={offer.id}
                   className="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col h-full border border-gray-100 overflow-hidden"
                 >
-                  {/* Image Section */}
+
                   <div className="relative h-56 w-full overflow-hidden">
                     <Image
                       src={offer.imageUrl || "https://via.placeholder.com/400x250"}
@@ -67,9 +67,9 @@ export default async function OffersPage() {
                     </div>
                   </div>
 
-                  {/* Info Section */}
+
                   <div className="p-6 flex flex-col flex-grow">
-                    {/* Validity & Store Type */}
+
                     <div className="flex items-center justify-between text-[12px] text-slate-600 mb-5 bg-slate-50 p-3 rounded-xl border border-slate-100">
                       <div className="flex items-center gap-2">
                         <Calendar size={14} className="text-[#ef4a23]" />
@@ -85,7 +85,7 @@ export default async function OffersPage() {
                       </div>
                     </div>
 
-                    {/* Title & Subtitle */}
+
                     <div className="flex-grow mb-6">
                       <h3 className="text-lg font-black text-[#081621] leading-tight mb-2 group-hover:text-[#ef4a23] transition-colors">
                         {offer.mainTitle}
@@ -95,7 +95,7 @@ export default async function OffersPage() {
                       </p>
                     </div>
 
-                    {/* Action Button */}
+
                     <Link
                       href={`/offers/${offer.id}`}
                       className="w-full flex items-center justify-center gap-2 bg-[#081621] text-white py-3 rounded-xl font-bold hover:bg-[#ef4a23] transition-all active:scale-95 shadow-md shadow-gray-200"

@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { 
-  BarChart3, 
-  TrendingUp, 
-  PieChart, 
-  ArrowUpRight, 
-  ArrowDownRight, 
+import {
+  BarChart3,
+  TrendingUp,
+  PieChart,
+  ArrowUpRight,
+  ArrowDownRight,
   Calendar,
   PackageCheck,
   Users,
@@ -14,20 +14,20 @@ import {
   Download
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  AreaChart, 
-  Area, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  ResponsiveContainer 
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer
 } from "recharts";
 
 export default function AnalyticsReport() {
   const [timeRange, setTimeRange] = useState("Monthly");
 
-  // ১. ডাইনামিক ডেটা অবজেক্ট - এখানে প্রতিটির জন্য আলাদা ডেটা সেট করা হয়েছে
+
   const reportData = {
     Daily: {
       revenue: [
@@ -37,10 +37,10 @@ export default function AnalyticsReport() {
         { name: "08 PM", sales: 2100, profit: 1400 },
       ],
       stats: [
-        { label: "Today's Revenue", value: "$4,600", change: "+4.2%", isPositive: true, icon: <TrendingUp size={20}/> },
-        { label: "Today's Orders", value: "42", change: "+12.1%", isPositive: true, icon: <PackageCheck size={20}/> },
-        { label: "Active Now", value: "124", change: "+2.4%", isPositive: true, icon: <Users size={20}/> },
-        { label: "New Wishlist", value: "15", change: "-5.3%", isPositive: false, icon: <Heart size={20}/> },
+        { label: "Today's Revenue", value: "$4,600", change: "+4.2%", isPositive: true, icon: <TrendingUp size={20} /> },
+        { label: "Today's Orders", value: "42", change: "+12.1%", isPositive: true, icon: <PackageCheck size={20} /> },
+        { label: "Active Now", value: "124", change: "+2.4%", isPositive: true, icon: <Users size={20} /> },
+        { label: "New Wishlist", value: "15", change: "-5.3%", isPositive: false, icon: <Heart size={20} /> },
       ]
     },
     Weekly: {
@@ -51,10 +51,10 @@ export default function AnalyticsReport() {
         { name: "Sun", sales: 5100, profit: 3400 },
       ],
       stats: [
-        { label: "Weekly Revenue", value: "$15,200", change: "+10.5%", isPositive: true, icon: <TrendingUp size={20}/> },
-        { label: "Weekly Orders", value: "310", change: "+5.2%", isPositive: true, icon: <PackageCheck size={20}/> },
-        { label: "Weekly Visitors", value: "2,400", change: "+8.4%", isPositive: true, icon: <Users size={20}/> },
-        { label: "Wishlist Added", value: "142", change: "+12.3%", isPositive: true, icon: <Heart size={20}/> },
+        { label: "Weekly Revenue", value: "$15,200", change: "+10.5%", isPositive: true, icon: <TrendingUp size={20} /> },
+        { label: "Weekly Orders", value: "310", change: "+5.2%", isPositive: true, icon: <PackageCheck size={20} /> },
+        { label: "Weekly Visitors", value: "2,400", change: "+8.4%", isPositive: true, icon: <Users size={20} /> },
+        { label: "Wishlist Added", value: "142", change: "+12.3%", isPositive: true, icon: <Heart size={20} /> },
       ]
     },
     Monthly: {
@@ -68,10 +68,10 @@ export default function AnalyticsReport() {
         { name: "Jul", sales: 7490, profit: 4300 },
       ],
       stats: [
-        { label: "Total Revenue", value: "$45,290", change: "+12.5%", isPositive: true, icon: <TrendingUp size={20}/> },
-        { label: "Total Orders", value: "1,240", change: "+8.2%", isPositive: true, icon: <PackageCheck size={20}/> },
-        { label: "Active Customers", value: "8,500", change: "-2.4%", isPositive: false, icon: <Users size={20}/> },
-        { label: "Wishlist Items", value: "3,120", change: "+15.3%", isPositive: true, icon: <Heart size={20}/> },
+        { label: "Total Revenue", value: "$45,290", change: "+12.5%", isPositive: true, icon: <TrendingUp size={20} /> },
+        { label: "Total Orders", value: "1,240", change: "+8.2%", isPositive: true, icon: <PackageCheck size={20} /> },
+        { label: "Active Customers", value: "8,500", change: "-2.4%", isPositive: false, icon: <Users size={20} /> },
+        { label: "Wishlist Items", value: "3,120", change: "+15.3%", isPositive: true, icon: <Heart size={20} /> },
       ]
     },
     Yearly: {
@@ -81,15 +81,15 @@ export default function AnalyticsReport() {
         { name: "2025", sales: 84000, profit: 59000 },
       ],
       stats: [
-        { label: "Annual Revenue", value: "$240,000", change: "+22.5%", isPositive: true, icon: <TrendingUp size={20}/> },
-        { label: "Annual Orders", value: "15,240", change: "+18.2%", isPositive: true, icon: <PackageCheck size={20}/> },
-        { label: "Total Reach", value: "92,500", change: "+42.4%", isPositive: true, icon: <Users size={20}/> },
-        { label: "Brand Loyalty", value: "85%", change: "+5.3%", isPositive: true, icon: <Heart size={20}/> },
+        { label: "Annual Revenue", value: "$240,000", change: "+22.5%", isPositive: true, icon: <TrendingUp size={20} /> },
+        { label: "Annual Orders", value: "15,240", change: "+18.2%", isPositive: true, icon: <PackageCheck size={20} /> },
+        { label: "Total Reach", value: "92,500", change: "+42.4%", isPositive: true, icon: <Users size={20} /> },
+        { label: "Brand Loyalty", value: "85%", change: "+5.3%", isPositive: true, icon: <Heart size={20} /> },
       ]
     }
   };
 
-  // বর্তমানে সিলেক্ট করা ডেটা ফিল্টার করা
+
   const currentContent = useMemo(() => reportData[timeRange as keyof typeof reportData], [timeRange]);
 
   const bestSellingItems = [
@@ -101,7 +101,7 @@ export default function AnalyticsReport() {
 
   return (
     <div className="space-y-6 pb-10">
-      {/* Header & Functional Filter */}
+
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-[#262B3B] flex items-center gap-2">
@@ -113,8 +113,8 @@ export default function AnalyticsReport() {
         <div className="flex items-center gap-3">
           <div className="bg-white border border-gray-200 rounded-xl px-3 py-2 flex items-center gap-2 shadow-sm focus-within:ring-2 focus-within:ring-[#FF5722]/20">
             <Calendar size={16} className="text-[#FF5722]" />
-            <select 
-              value={timeRange} 
+            <select
+              value={timeRange}
               onChange={(e) => setTimeRange(e.target.value)}
               className="text-xs font-bold outline-none bg-transparent text-gray-600 cursor-pointer"
             >
@@ -130,11 +130,11 @@ export default function AnalyticsReport() {
         </div>
       </div>
 
-      {/* Dynamic Stats Cards */}
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <AnimatePresence mode="wait">
           {currentContent.stats.map((stat, i) => (
-            <motion.div 
+            <motion.div
               key={`${timeRange}-${i}`} // Key change triggers animation when range changes
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -147,7 +147,7 @@ export default function AnalyticsReport() {
                   {stat.icon}
                 </div>
                 <div className={`flex items-center gap-1 text-xs font-black ${stat.isPositive ? 'text-green-500' : 'text-red-500'}`}>
-                  {stat.isPositive ? <ArrowUpRight size={14}/> : <ArrowDownRight size={14}/>}
+                  {stat.isPositive ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
                   {stat.change}
                 </div>
               </div>
@@ -160,7 +160,7 @@ export default function AnalyticsReport() {
         </AnimatePresence>
       </div>
 
-      {/* Sales Revenue Chart - Updated to dynamic revenueData */}
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
           <div className="flex justify-between items-center mb-6">
@@ -170,53 +170,53 @@ export default function AnalyticsReport() {
               <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-gray-300"></span> Profit</div>
             </div>
           </div>
-          
+
           <div className="h-[320px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={currentContent.revenue} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#FF5722" stopOpacity={0.1}/>
-                    <stop offset="95%" stopColor="#FF5722" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="#FF5722" stopOpacity={0.1} />
+                    <stop offset="95%" stopColor="#FF5722" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
-                <XAxis 
-                  dataKey="name" 
-                  axisLine={false} 
-                  tickLine={false} 
-                  tick={{ fontSize: 12, fontWeight: 600, fill: '#9ca3af' }} 
+                <XAxis
+                  dataKey="name"
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fontSize: 12, fontWeight: 600, fill: '#9ca3af' }}
                   dy={10}
                 />
-                <YAxis 
-                  axisLine={false} 
-                  tickLine={false} 
-                  tick={{ fontSize: 12, fontWeight: 600, fill: '#9ca3af' }} 
+                <YAxis
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fontSize: 12, fontWeight: 600, fill: '#9ca3af' }}
                 />
-                <Tooltip 
+                <Tooltip
                   contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
                 />
-                <Area 
-                  type="monotone" 
-                  dataKey="sales" 
-                  stroke="#FF5722" 
+                <Area
+                  type="monotone"
+                  dataKey="sales"
+                  stroke="#FF5722"
                   strokeWidth={3}
-                  fillOpacity={1} 
-                  fill="url(#colorSales)" 
+                  fillOpacity={1}
+                  fill="url(#colorSales)"
                 />
-                <Area 
-                  type="monotone" 
-                  dataKey="profit" 
-                  stroke="#D1D5DB" 
+                <Area
+                  type="monotone"
+                  dataKey="profit"
+                  stroke="#D1D5DB"
                   strokeWidth={2}
-                  fill="transparent" 
+                  fill="transparent"
                 />
               </AreaChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        {/* Customer Insights - Static UI consistent with your design */}
+
         <div className="bg-[#262B3B] p-6 rounded-2xl shadow-xl text-white">
           <h3 className="font-bold mb-6 flex items-center gap-2">
             <PieChart size={20} className="text-[#FF5722]" /> Customer Insights
@@ -257,7 +257,7 @@ export default function AnalyticsReport() {
         </div>
       </div>
 
-      {/* Best Selling Items Table */}
+
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         <div className="p-6 border-b border-gray-50 flex justify-between items-center">
           <h3 className="font-bold text-[#262B3B]">Best Selling Products</h3>
@@ -279,9 +279,8 @@ export default function AnalyticsReport() {
                   <td className="px-6 py-4 text-sm font-bold text-[#262B3B]">{item.name}</td>
                   <td className="px-6 py-4 text-sm font-semibold text-gray-600">{item.sales} Units</td>
                   <td className="px-6 py-4">
-                    <span className={`text-[10px] font-black uppercase px-2 py-1 rounded-md ${
-                      item.stock === 'Out of Stock' ? 'bg-red-50 text-red-500' : 'bg-green-50 text-green-600'
-                    }`}>
+                    <span className={`text-[10px] font-black uppercase px-2 py-1 rounded-md ${item.stock === 'Out of Stock' ? 'bg-red-50 text-red-500' : 'bg-green-50 text-green-600'
+                      }`}>
                       {item.stock}
                     </span>
                   </td>

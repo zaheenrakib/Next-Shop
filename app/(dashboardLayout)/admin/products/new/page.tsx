@@ -19,7 +19,7 @@ export default function NewProduct() {
   const [attributes, setAttributes] = useState<any[]>([]);
   const [allAttrValues, setAllAttrValues] = useState<any[]>([]);
 
-  // Form State
+
   const [product, setProduct] = useState({
     name: '',
     brand: '',
@@ -44,7 +44,7 @@ export default function NewProduct() {
       fetch('/api/attributes'),
       fetch('/api/attribute-values')
     ]);
-    
+
     setCategories(await catRes.json());
     setBrands(await brandRes.json());
     setAttributes(await attrRes.json());
@@ -124,7 +124,7 @@ export default function NewProduct() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {/* Left Column: Basic Info & Specs */}
+
         <div className="md:col-span-2 space-y-6">
           <Card>
             <CardHeader>
@@ -133,16 +133,16 @@ export default function NewProduct() {
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium">Product Name</label>
-                <Input 
-                  placeholder="e.g. iPhone 15 Pro" 
+                <Input
+                  placeholder="e.g. iPhone 15 Pro"
                   value={product.name}
-                  onChange={(e) => setProduct({...product, name: e.target.value})}
+                  onChange={(e) => setProduct({ ...product, name: e.target.value })}
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Brand</label>
-                  <Select onValueChange={(val) => setProduct({...product, brand: val})}>
+                  <Select onValueChange={(val) => setProduct({ ...product, brand: val })}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select Brand" />
                     </SelectTrigger>
@@ -165,17 +165,17 @@ export default function NewProduct() {
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-medium">Description</label>
-                <Textarea 
-                  placeholder="Enter product details..." 
+                <Textarea
+                  placeholder="Enter product details..."
                   className="h-32"
                   value={product.description}
-                  onChange={(e) => setProduct({...product, description: e.target.value})}
+                  onChange={(e) => setProduct({ ...product, description: e.target.value })}
                 />
               </div>
             </CardContent>
           </Card>
 
-          {/* Dynamic Specifications */}
+
           {categoryAttrs.length > 0 && (
             <Card>
               <CardHeader>
@@ -186,19 +186,19 @@ export default function NewProduct() {
                   <div key={attr.id} className="space-y-2">
                     <label className="text-sm font-medium">{attr.name}</label>
                     {attr.type === 'select' ? (
-                       <Select onValueChange={(val) => updateSpec(attr.id, val)}>
-                          <SelectTrigger>
-                            <SelectValue placeholder={`Select ${attr.name}`} />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {allAttrValues
-                              .filter(v => v.attributeId === attr.id)
-                              .map(v => <SelectItem key={v.id} value={v.value}>{v.value}</SelectItem>)
-                            }
-                          </SelectContent>
-                       </Select>
+                      <Select onValueChange={(val) => updateSpec(attr.id, val)}>
+                        <SelectTrigger>
+                          <SelectValue placeholder={`Select ${attr.name}`} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {allAttrValues
+                            .filter(v => v.attributeId === attr.id)
+                            .map(v => <SelectItem key={v.id} value={v.value}>{v.value}</SelectItem>)
+                          }
+                        </SelectContent>
+                      </Select>
                     ) : (
-                      <Input 
+                      <Input
                         type={attr.type === 'number' ? 'number' : 'text'}
                         placeholder={`Enter ${attr.name}`}
                         onChange={(e) => updateSpec(attr.id, e.target.value)}
@@ -210,7 +210,7 @@ export default function NewProduct() {
             </Card>
           )}
 
-          {/* Variants Section */}
+
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>Variants</CardTitle>
@@ -221,20 +221,20 @@ export default function NewProduct() {
             <CardContent className="space-y-4">
               {variants.map((variant, vIdx) => (
                 <div key={vIdx} className="p-4 border rounded-lg space-y-4 relative bg-white/50">
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
+                  <Button
+                    variant="ghost"
+                    size="icon"
                     className="absolute top-2 right-2 text-destructive"
                     onClick={() => removeVariant(vIdx)}
                   >
                     <Trash2 className="w-4 h-4" />
                   </Button>
-                  
+
                   <div className="grid grid-cols-3 gap-4">
                     <div className="space-y-2">
                       <label className="text-sm font-medium">Price</label>
-                      <Input 
-                        type="number" 
+                      <Input
+                        type="number"
                         placeholder="0.00"
                         value={variant.price}
                         onChange={(e) => updateVariant(vIdx, 'price', parseFloat(e.target.value))}
@@ -242,8 +242,8 @@ export default function NewProduct() {
                     </div>
                     <div className="space-y-2">
                       <label className="text-sm font-medium">Stock</label>
-                      <Input 
-                        type="number" 
+                      <Input
+                        type="number"
                         placeholder="0"
                         value={variant.stock}
                         onChange={(e) => updateVariant(vIdx, 'stock', parseInt(e.target.value))}
@@ -251,7 +251,7 @@ export default function NewProduct() {
                     </div>
                     <div className="space-y-2">
                       <label className="text-sm font-medium">SKU</label>
-                      <Input 
+                      <Input
                         placeholder="Auto-generated if empty"
                         value={variant.sku}
                         onChange={(e) => updateVariant(vIdx, 'sku', e.target.value)}
@@ -259,36 +259,36 @@ export default function NewProduct() {
                     </div>
                   </div>
 
-                  {/* Attribute Selector for Variant */}
+
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Variant Attributes</label>
                     <div className="flex flex-wrap gap-4">
                       {categoryAttrs
                         .filter((attr: any) => attr.type === 'select')
                         .map((attr: any) => (
-                        <div key={attr.id} className="space-y-1">
-                          <span className="text-xs text-muted-foreground">{attr.name}</span>
-                          <Select 
-                            onValueChange={(val) => {
-                              const otherAttrs = variant.attributeValues.filter((vId: string) => {
-                                const valObj = allAttrValues.find(av => av.id === vId);
-                                return valObj?.attributeId !== attr.id;
-                              });
-                              updateVariant(vIdx, 'attributeValues', [...otherAttrs, val]);
-                            }}
-                          >
-                            <SelectTrigger className="w-[150px]">
-                              <SelectValue placeholder="Choose" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {allAttrValues
-                                .filter(val => val.attributeId === attr.id)
-                                .map(val => <SelectItem key={val.id} value={val.id}>{val.value}</SelectItem>)
-                              }
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      ))}
+                          <div key={attr.id} className="space-y-1">
+                            <span className="text-xs text-muted-foreground">{attr.name}</span>
+                            <Select
+                              onValueChange={(val) => {
+                                const otherAttrs = variant.attributeValues.filter((vId: string) => {
+                                  const valObj = allAttrValues.find(av => av.id === vId);
+                                  return valObj?.attributeId !== attr.id;
+                                });
+                                updateVariant(vIdx, 'attributeValues', [...otherAttrs, val]);
+                              }}
+                            >
+                              <SelectTrigger className="w-[150px]">
+                                <SelectValue placeholder="Choose" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {allAttrValues
+                                  .filter(val => val.attributeId === attr.id)
+                                  .map(val => <SelectItem key={val.id} value={val.id}>{val.value}</SelectItem>)
+                                }
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        ))}
                     </div>
                   </div>
                 </div>
@@ -302,7 +302,7 @@ export default function NewProduct() {
           </Card>
         </div>
 
-        {/* Right Column: Media & Status */}
+
         <div className="space-y-6">
           <Card>
             <CardHeader>
@@ -311,15 +311,15 @@ export default function NewProduct() {
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium">Thumbnail URL</label>
-                <Input 
+                <Input
                   placeholder="https://..."
                   value={product.thumbnail}
-                  onChange={(e) => setProduct({...product, thumbnail: e.target.value})}
+                  onChange={(e) => setProduct({ ...product, thumbnail: e.target.value })}
                 />
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-medium">Status</label>
-                <Select defaultValue="active" onValueChange={(val) => setProduct({...product, status: val})}>
+                <Select defaultValue="active" onValueChange={(val) => setProduct({ ...product, status: val })}>
                   <SelectTrigger>
                     <SelectValue placeholder="Status" />
                   </SelectTrigger>

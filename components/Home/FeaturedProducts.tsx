@@ -21,10 +21,10 @@ export default function FeaturedProducts() {
           "http://localhost:3000/api/products"
         );
 
-        // আপনার API স্ট্রাকচার অনুযায়ী products অ্যারেটি বের করে আনা হলো
+
         const productsArray = response.data.products || [];
 
-        // এখন সঠিকভাবে স্লাইস হবে
+
         setFeaturedProducts(productsArray.slice(0, 8));
       } catch (error) {
         console.error("Error fetching featured products:", error);
@@ -39,7 +39,7 @@ export default function FeaturedProducts() {
   return (
     <section className="py-12">
       <div className="container mx-auto px-4">
-        {/* হেডার সেকশনটি প্রিমিয়াম করার জন্য padding এবং layout ঠিক করা হয়েছে */}
+
         <div className="flex items-end justify-between mb-8">
           <div>
             <h2 className="text-3xl font-black text-slate-900 tracking-tight uppercase italic">

@@ -1,24 +1,24 @@
 
-// @/app/api/hero/side-bar/route.ts
+
 import { NextResponse } from "next/server";
 import { heroSidebarService } from "@/services/heroSidebarService";
 
-// ১. সব সাইডবার ডাটা আনা
+
 export async function GET() {
   try {
     const data = await heroSidebarService.getSidebarData();
-    return NextResponse.json(data); 
+    return NextResponse.json(data);
   } catch (error: any) {
     return NextResponse.json({ error: "Failed to fetch data" }, { status: 500 });
   }
 }
 
-// ২. ক্রিয়েট অথবা আপডেট করা (Upsert)
+
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    // ফ্রন্টএন্ড থেকে পাঠানো 'mainBanner' বা 'sidePromotion' যাই আসুক, আমরা ডাটা নিচ্ছি
-    const data = body.sidePromotion || body.mainBanner; 
+
+    const data = body.sidePromotion || body.mainBanner;
 
     if (!data) {
       return NextResponse.json({ error: "No data provided" }, { status: 400 });
@@ -38,7 +38,7 @@ export async function POST(req: Request) {
   }
 }
 
-// ৩. ডাটা ডিলিট করা
+
 export async function DELETE(req: Request) {
   try {
     const { searchParams } = new URL(req.url);

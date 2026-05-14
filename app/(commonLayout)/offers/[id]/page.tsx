@@ -15,7 +15,7 @@ import {
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 
-// Date format helper
+
 const formatDate = (date: string | Date) => {
   return new Intl.DateTimeFormat('en-GB', {
     day: '2-digit',
@@ -25,7 +25,7 @@ const formatDate = (date: string | Date) => {
 };
 
 export default async function OfferDetail({ params }: { params: { id: string } }) {
-  // Fetching specific offer data by ID
+
   const offer = await prisma.offer.findUnique({
     where: { id: params.id }
   });
@@ -34,7 +34,7 @@ export default async function OfferDetail({ params }: { params: { id: string } }
     return notFound();
   }
 
-  // Parsing rewards and terms safely
+
   const rewards = offer.rewards as any;
   const terms = offer.termsAndConditions as string[];
 
@@ -44,10 +44,10 @@ export default async function OfferDetail({ params }: { params: { id: string } }
       <div className="bg-[#f2f4f8] min-h-screen py-8 px-4">
         <div className="max-w-5xl mx-auto">
 
-          {/* Main Content Card */}
+
           <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
 
-            {/* Header Section with Image */}
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-6 md:p-10 border-b border-gray-100">
               <div className="relative h-[300px] md:h-[400px] w-full rounded-lg overflow-hidden shadow-inner bg-gray-50">
                 <Image
@@ -87,10 +87,10 @@ export default async function OfferDetail({ params }: { params: { id: string } }
               </div>
             </div>
 
-            {/* Details & Rewards Section */}
+
             <div className="p-6 md:p-10 grid grid-cols-1 md:grid-cols-3 gap-8">
 
-              {/* Rewards Card */}
+
               <div className="md:col-span-2 space-y-8">
                 <div>
                   <h2 className="text-xl font-bold text-[#081621] mb-4 flex items-center gap-2">
@@ -133,7 +133,7 @@ export default async function OfferDetail({ params }: { params: { id: string } }
                   </div>
                 </div>
 
-                {/* Terms and Conditions */}
+
                 <div>
                   <h2 className="text-xl font-bold text-[#081621] mb-4 flex items-center gap-2">
                     <Info className="text-[#3749bb]" /> Terms & Conditions
@@ -151,7 +151,7 @@ export default async function OfferDetail({ params }: { params: { id: string } }
                 </div>
               </div>
 
-              {/* Sidebar / Quick Info */}
+
               <div className="bg-gray-50 p-6 rounded-xl h-fit border border-gray-200">
                 <h3 className="font-bold text-[#081621] mb-4 border-b pb-2">Quick Summary</h3>
                 <div className="space-y-4 text-sm">
@@ -168,8 +168,8 @@ export default async function OfferDetail({ params }: { params: { id: string } }
                 </div>
                 <button className="w-full mt-8 bg-[#3749bb] text-white py-3 rounded-lg font-bold hover:bg-[#2c3a96] transition-all shadow-lg shadow-blue-200">
                   <Link href={'/products'} >
-                  Shop Now
-                </Link>
+                    Shop Now
+                  </Link>
                 </button>
               </div>
 

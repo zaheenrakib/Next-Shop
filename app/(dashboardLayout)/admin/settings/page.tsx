@@ -1,14 +1,14 @@
 "use client";
 
 import React, { useState } from "react";
-import { 
-  Settings, 
-  Truck, 
-  Globe, 
-  Image as ImageIcon, 
-  Phone, 
-  Share2, 
-  Lock, 
+import {
+  Settings,
+  Truck,
+  Globe,
+  Image as ImageIcon,
+  Phone,
+  Share2,
+  Lock,
   Save,
   CheckCircle2,
   Info,
@@ -22,10 +22,10 @@ export default function GeneralSettings() {
   const [isSaving, setIsSaving] = useState(false);
   const [showToast, setShowToast] = useState(false);
 
-  // Handlers
+
   const handleSave = () => {
     setIsSaving(true);
-    // Simulate API Call
+
     setTimeout(() => {
       setIsSaving(false);
       setShowToast(true);
@@ -41,7 +41,7 @@ export default function GeneralSettings() {
 
   return (
     <div className=" space-y-6 pb-20">
-      {/* Header */}
+
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-black text-[#262B3B] flex items-center gap-2">
@@ -50,7 +50,7 @@ export default function GeneralSettings() {
           </h1>
           <p className="text-gray-500 text-sm">Configure your store infrastructure and preferences.</p>
         </div>
-        <button 
+        <button
           onClick={handleSave}
           disabled={isSaving}
           className="flex items-center gap-2 px-6 py-2.5 bg-[#FF5722] text-white rounded-xl font-bold shadow-lg shadow-[#FF5722]/20 hover:bg-[#e64a19] transition-all disabled:opacity-70"
@@ -61,17 +61,16 @@ export default function GeneralSettings() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
-        {/* Sidebar Navigation */}
+
         <div className="md:col-span-3 space-y-2">
           {navItems.map((item) => (
             <button
               key={item.id}
               onClick={() => setActiveSection(item.id)}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${
-                activeSection === item.id 
-                ? "bg-white text-[#FF5722] shadow-sm border border-gray-100" 
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeSection === item.id
+                ? "bg-white text-[#FF5722] shadow-sm border border-gray-100"
                 : "text-gray-500 hover:bg-gray-100 hover:text-[#262B3B]"
-              }`}
+                }`}
             >
               <item.icon size={18} />
               {item.label}
@@ -79,11 +78,11 @@ export default function GeneralSettings() {
           ))}
         </div>
 
-        {/* Content Area */}
+
         <div className="md:col-span-9">
           <AnimatePresence mode="wait">
             {activeSection === "shipping" && (
-              <motion.div 
+              <motion.div
                 key="shipping"
                 initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }}
                 className="space-y-6"
@@ -126,7 +125,7 @@ export default function GeneralSettings() {
             )}
 
             {activeSection === "config" && (
-              <motion.div 
+              <motion.div
                 key="config"
                 initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }}
                 className="space-y-6"
@@ -180,7 +179,7 @@ export default function GeneralSettings() {
             )}
 
             {activeSection === "payment" && (
-              <motion.div 
+              <motion.div
                 key="payment"
                 initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }}
                 className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm space-y-6"
@@ -214,10 +213,10 @@ export default function GeneralSettings() {
         </div>
       </div>
 
-      {/* Success Toast */}
+
       <AnimatePresence>
         {showToast && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 50 }}
             className="fixed bottom-10 right-10 flex items-center gap-3 px-6 py-3 bg-[#262B3B] text-white rounded-2xl shadow-2xl z-50 border-b-4 border-[#FF5722]"
           >

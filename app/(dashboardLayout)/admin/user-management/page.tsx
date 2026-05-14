@@ -1,13 +1,13 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { 
-  Users, 
-  ShieldCheck, 
-  UserPlus, 
-  Search, 
-  Mail, 
-  Phone, 
+import {
+  Users,
+  ShieldCheck,
+  UserPlus,
+  Search,
+  Mail,
+  Phone,
   MoreHorizontal,
   History,
   Lock,
@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-// --- ফেক কাস্টমার এবং স্টাফ ডেটা ---
+
 const initialCustomers = [
   { id: "C-4410", name: "Mahmudul Hasan Ratul", email: "ratul@example.com", phone: "017XXXXXXXX", orders: 12, spent: "$4,500", joined: "2025-10-09" },
   { id: "C-4411", name: "Md. Rasel Mahmud", email: "rasel@banker.com", phone: "018XXXXXXXX", orders: 5, spent: "$1,200", joined: "2026-04-01" },
@@ -36,15 +36,15 @@ export default function UserManagement() {
   const [searchTerm, setSearchTerm] = useState("");
 
   const filteredCustomers = useMemo(() => {
-    return initialCustomers.filter(c => 
-      c.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    return initialCustomers.filter(c =>
+      c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       c.email.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [searchTerm]);
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-[#262B3B] flex items-center gap-2">
@@ -58,15 +58,15 @@ export default function UserManagement() {
         </button>
       </div>
 
-      {/* Toggle Tabs */}
+
       <div className="flex p-1 bg-gray-100 rounded-2xl w-fit border border-gray-200">
-        <button 
+        <button
           onClick={() => setActiveTab("Customers")}
           className={`flex items-center gap-2 px-6 py-2 rounded-xl text-sm font-bold transition-all ${activeTab === "Customers" ? "bg-white text-[#FF5722] shadow-sm" : "text-gray-500"}`}
         >
           <Users size={18} /> Customers
         </button>
-        <button 
+        <button
           onClick={() => setActiveTab("Staff")}
           className={`flex items-center gap-2 px-6 py-2 rounded-xl text-sm font-bold transition-all ${activeTab === "Staff" ? "bg-white text-[#FF5722] shadow-sm" : "text-gray-500"}`}
         >
@@ -74,11 +74,11 @@ export default function UserManagement() {
         </button>
       </div>
 
-      {/* Search & Filter */}
+
       <div className="relative max-w-md">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-        <input 
-          type="text" 
+        <input
+          type="text"
           placeholder={`Search ${activeTab.toLowerCase()}...`}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
@@ -86,7 +86,7 @@ export default function UserManagement() {
         />
       </div>
 
-      {/* Content Area */}
+
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left">
@@ -184,7 +184,7 @@ export default function UserManagement() {
         </div>
       </div>
 
-      {/* Customer Quick Stats (Optional) */}
+
       {activeTab === "Customers" && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
@@ -196,7 +196,7 @@ export default function UserManagement() {
               <CheckCircle2 size={24} />
             </div>
           </div>
-          {/* Add more stats as needed */}
+
         </div>
       )}
     </div>

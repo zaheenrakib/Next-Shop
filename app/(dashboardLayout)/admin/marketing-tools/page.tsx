@@ -1,14 +1,14 @@
 "use client";
 
 import React, { useState } from "react";
-import { 
-  Ticket, 
-  Image as ImageIcon, 
-  Cpu, 
-  Plus, 
-  ToggleRight, 
-  Edit, 
-  Trash2, 
+import {
+  Ticket,
+  Image as ImageIcon,
+  Cpu,
+  Plus,
+  ToggleRight,
+  Edit,
+  Trash2,
   Settings2,
   Calendar,
   Monitor
@@ -18,13 +18,13 @@ import { motion, AnimatePresence } from "framer-motion";
 export default function MarketingTools() {
   const [activeSection, setActiveSection] = useState("Coupons");
 
-  // Fake Data for Coupons
+
   const coupons = [
     { id: 1, code: "EID2026", discount: "20%", type: "Percentage", expiry: "2026-06-20", status: "Active" },
     { id: 2, code: "TECHLOVER", discount: "$50", type: "Fixed", expiry: "2026-05-15", status: "Expired" },
   ];
 
-  // Fake Data for Banners
+
   const banners = [
     { id: 1, title: "Summer Flash Sale", image: "https://via.placeholder.com/600x200", position: "Main Slider" },
     { id: 2, title: "Intel 14th Gen Launch", image: "https://via.placeholder.com/600x200", position: "Side Banner" },
@@ -32,7 +32,7 @@ export default function MarketingTools() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-[#262B3B] flex items-center gap-2">
@@ -43,7 +43,7 @@ export default function MarketingTools() {
         </div>
       </div>
 
-      {/* Control Tabs */}
+
       <div className="flex p-1 bg-gray-100 rounded-2xl w-fit border border-gray-200">
         {[
           { id: "Coupons", icon: <Ticket size={18} />, label: "Coupons" },
@@ -53,19 +53,18 @@ export default function MarketingTools() {
           <button
             key={tab.id}
             onClick={() => setActiveSection(tab.id)}
-            className={`flex items-center gap-2 px-6 py-2 rounded-xl text-sm font-bold transition-all ${
-              activeSection === tab.id ? "bg-white text-[#FF5722] shadow-sm" : "text-gray-500"
-            }`}
+            className={`flex items-center gap-2 px-6 py-2 rounded-xl text-sm font-bold transition-all ${activeSection === tab.id ? "bg-white text-[#FF5722] shadow-sm" : "text-gray-500"
+              }`}
           >
             {tab.icon} {tab.label}
           </button>
         ))}
       </div>
 
-      {/* Sections Content */}
+
       <div className="min-h-[400px]">
         <AnimatePresence mode="wait">
-          {/* 1. Coupons & Discounts */}
+
           {activeSection === "Coupons" && (
             <motion.div
               key="coupons"
@@ -94,8 +93,8 @@ export default function MarketingTools() {
                       </div>
                     </div>
                     <div className="flex flex-col gap-2">
-                      <button className="p-2 hover:bg-gray-100 rounded-lg text-gray-400"><Edit size={16}/></button>
-                      <button className="p-2 hover:bg-red-50 rounded-lg text-red-500"><Trash2 size={16}/></button>
+                      <button className="p-2 hover:bg-gray-100 rounded-lg text-gray-400"><Edit size={16} /></button>
+                      <button className="p-2 hover:bg-red-50 rounded-lg text-red-500"><Trash2 size={16} /></button>
                     </div>
                   </div>
                 ))}
@@ -103,7 +102,7 @@ export default function MarketingTools() {
             </motion.div>
           )}
 
-          {/* 2. Banner & Slider Control */}
+
           {activeSection === "Banners" && (
             <motion.div
               key="banners"
@@ -138,7 +137,7 @@ export default function MarketingTools() {
             </motion.div>
           )}
 
-          {/* 3. PC Builder Logic */}
+
           {activeSection === "PCBuilder" && (
             <motion.div
               key="pcbuilder"

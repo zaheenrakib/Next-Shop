@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 
-// --- Success Notification Component ---
+
 const AddToCartSuccess = ({ name, image }: { name: string; image: string }) => (
   <div className="flex items-center gap-4 p-2 w-full">
     <div className="relative h-12 w-12 flex-shrink-0">
@@ -60,7 +60,7 @@ export default function ProductDetailsPage({ params }: any) {
     }
   };
 
-  // 🛒 ADD TO CART FUNCTION
+
   const addToCart = () => {
     if (!product) return;
     try {
@@ -80,7 +80,7 @@ export default function ProductDetailsPage({ params }: any) {
         cart.push(item);
       }
       localStorage.setItem('cart', JSON.stringify(cart));
-      window.dispatchEvent(new Event('storage')); 
+      window.dispatchEvent(new Event('storage'));
       toast(<AddToCartSuccess name={product.name} image={product.thumbnail} />, {
         duration: 3000,
         className: "rounded-2xl border-none shadow-2xl bg-white p-4",
@@ -90,10 +90,10 @@ export default function ProductDetailsPage({ params }: any) {
     }
   };
 
-  // 🚀 BUY NOW FUNCTION (DIRECT CHECKOUT)
+
   const handleBuyNow = () => {
     if (!product) return;
-    
+
     const item = {
       id: product.id || product._id,
       name: product.name,
@@ -103,10 +103,10 @@ export default function ProductDetailsPage({ params }: any) {
       qty: 1
     };
 
-    // সরাসরি লোকাল স্টোরেজে এই আইটেমটি সেট করে চেকআউট পেজে পাঠানো
-    // এটি করলে আগের কার্ট ক্লিয়ার হয়ে যাবে, যা "Buy Now" এর জন্য স্ট্যান্ডার্ড
+
+
     localStorage.setItem('cart', JSON.stringify([item]));
-    window.dispatchEvent(new Event('storage')); 
+    window.dispatchEvent(new Event('storage'));
     router.push('/checkout');
   };
 
@@ -126,8 +126,8 @@ export default function ProductDetailsPage({ params }: any) {
 
       <main className="max-w-6xl mx-auto px-4 py-12">
         <div className="grid md:grid-cols-2 gap-12 bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
-          
-          {/* IMAGE SECTION */}
+
+
           <div className="bg-gray-50 rounded-2xl overflow-hidden border border-gray-100 p-6 flex items-center justify-center">
             <Image
               src={product.thumbnail}
@@ -138,12 +138,12 @@ export default function ProductDetailsPage({ params }: any) {
             />
           </div>
 
-          {/* INFO SECTION */}
+
           <div className="flex flex-col justify-center">
             <Badge variant="secondary" className="w-fit bg-blue-50 text-blue-600 border-none px-3 py-1 mb-4">
               {product.brand?.name || 'Premium Quality'}
             </Badge>
-            
+
             <h1 className="text-4xl font-extrabold tracking-tight mb-4 leading-tight">
               {product.name}
             </h1>
@@ -164,7 +164,7 @@ export default function ProductDetailsPage({ params }: any) {
               <div className="text-4xl font-black">৳{(selectedVariant?.price || product.price).toLocaleString()}</div>
             </div>
 
-            {/* ACTION BUTTONS */}
+
             <div className="flex flex-col sm:flex-row gap-4">
               <Button
                 onClick={addToCart}
@@ -188,7 +188,7 @@ export default function ProductDetailsPage({ params }: any) {
           </div>
         </div>
 
-        {/* DETAILS TABS */}
+
         <div className="mt-12 bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
           <Tabs defaultValue="specs">
             <TabsList className="bg-gray-100 p-1 rounded-xl">

@@ -16,10 +16,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased">
-        
-        {/* //<Navbar>></Navbar> */}
+
+
         {children}
-        {/* <Toaster position="top-right" richColors /> */}
+
         <Toaster position="bottom-right" richColors />
 
       </body>

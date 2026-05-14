@@ -1,28 +1,28 @@
 "use client";
 
 import React from "react";
-import { 
-  DollarSign, 
-  Package, 
-  Users, 
-  TrendingUp, 
-  ArrowUpRight, 
+import {
+  DollarSign,
+  Package,
+  Users,
+  TrendingUp,
+  ArrowUpRight,
   ArrowDownRight,
   AlertTriangle,
   ShoppingCart
 } from "lucide-react";
 import { motion } from "framer-motion";
-import { 
-  AreaChart, 
-  Area, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  ResponsiveContainer 
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer
 } from "recharts";
 
-// Fake Data for Chart
+
 const data = [
   { name: "Sat", sales: 4000 },
   { name: "Sun", sales: 3000 },
@@ -33,7 +33,7 @@ const data = [
   { name: "Fri", sales: 3490 },
 ];
 
-// Stats Configuration
+
 const stats = [
   { label: "Total Sales", value: "$124,500", icon: <DollarSign size={20} />, trend: "+12.5%", up: true },
   { label: "Active Orders", value: "156", icon: <ShoppingCart size={20} />, trend: "+5.2%", up: true },
@@ -44,7 +44,7 @@ const stats = [
 export default function AdminDashboard() {
   return (
     <div className="space-y-8 pb-10">
-      {/* Header Section */}
+
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-[#262B3B]">Executive Overview</h1>
@@ -60,7 +60,7 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* 1. Stat Cards Section */}
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((item, index) => (
           <motion.div
@@ -87,7 +87,7 @@ export default function AdminDashboard() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* 2. Sales Analytics (Chart) */}
+
         <div className="lg:col-span-2 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
           <div className="flex justify-between items-center mb-6">
             <h2 className="font-bold text-[#262B3B]">Sales Revenue</h2>
@@ -101,14 +101,14 @@ export default function AdminDashboard() {
               <AreaChart data={data}>
                 <defs>
                   <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#FF5722" stopOpacity={0.1}/>
-                    <stop offset="95%" stopColor="#FF5722" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="#FF5722" stopOpacity={0.1} />
+                    <stop offset="95%" stopColor="#FF5722" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#9ca3af'}} />
-                <YAxis axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#9ca3af'}} />
-                <Tooltip 
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#9ca3af' }} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#9ca3af' }} />
+                <Tooltip
                   contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
                 />
                 <Area type="monotone" dataKey="sales" stroke="#FF5722" strokeWidth={3} fillOpacity={1} fill="url(#colorSales)" />
@@ -117,7 +117,7 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* 4. Best Selling Products & Low Stock */}
+
         <div className="space-y-8">
           <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
             <h2 className="font-bold text-[#262B3B] mb-4">Top Tech Items</h2>
@@ -157,7 +157,7 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* 3. Recent Orders Table */}
+
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         <div className="p-6 border-b border-gray-50 flex justify-between items-center">
           <h2 className="font-bold text-[#262B3B]">Latest Transactions</h2>

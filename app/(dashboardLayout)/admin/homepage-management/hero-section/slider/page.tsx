@@ -18,13 +18,13 @@ export default function HeroManagement() {
     mainBanner: { imageUrl: "", title: "", subtitle: "", buttonLink: "" }
   });
 
-  // ডাটা লোড করা
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         const res = await fetch("/api/hero/slider");
         const data = await res.json();
-        // console.log("data1:",data)
+
         if (res.ok && data && data.imageUrl !== undefined) {
           setFormData({
             mainBanner: {
@@ -49,56 +49,56 @@ export default function HeroManagement() {
     }));
   };
 
- const handleSubmit = async () => {
-  setLoading(true);
+  const handleSubmit = async () => {
+    setLoading(true);
 
-  try {
-    const res = await fetch("/api/hero/slider", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+    try {
+      const res = await fetch("/api/hero/slider", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
 
-      // FIXED
-      body: JSON.stringify({
-        id: formData.id,
-        mainBanner: formData.mainBanner,
-      }),
-    });
 
-    const result = await res.json();
-    console.log("ratul", result.id)
+        body: JSON.stringify({
+          id: formData.id,
+          mainBanner: formData.mainBanner,
+        }),
+      });
 
-    if (!res.ok) throw new Error(result.error || "Update failed");
+      const result = await res.json();
+      console.log("ratul", result.id)
 
-    setModal({
-      show: true,
-      type: "success",
-      message: "Slider updated successfully!",
-    });
+      if (!res.ok) throw new Error(result.error || "Update failed");
 
-    setFormData({
-      id: result.id, // FIXED
-      mainBanner: {
-        imageUrl: result.imageUrl,
-        title: result.title,
-        subtitle: result.subtitle,
-        buttonLink: result.buttonLink
-      },
-    });
-  } catch (error: any) {
-    setModal({
-      show: true,
-      type: "error",
-      message: error.message,
-    });
-  } finally {
-    setLoading(false);
+      setModal({
+        show: true,
+        type: "success",
+        message: "Slider updated successfully!",
+      });
 
-    setTimeout(
-      () => setModal((prev) => ({ ...prev, show: false })),
-      3000
-    );
-  }
-};
+      setFormData({
+        id: result.id, // FIXED
+        mainBanner: {
+          imageUrl: result.imageUrl,
+          title: result.title,
+          subtitle: result.subtitle,
+          buttonLink: result.buttonLink
+        },
+      });
+    } catch (error: any) {
+      setModal({
+        show: true,
+        type: "error",
+        message: error.message,
+      });
+    } finally {
+      setLoading(false);
+
+      setTimeout(
+        () => setModal((prev) => ({ ...prev, show: false })),
+        3000
+      );
+    }
+  };
 
   return (
     <div className="p-10 bg-[#fbfbfb] min-h-screen font-sans text-[#4b5563] relative">
@@ -150,7 +150,7 @@ export default function HeroManagement() {
                 onChange={(e) => handleInputChange("imageUrl", e.target.value)}
               />
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-4">
                 <div className="space-y-2">

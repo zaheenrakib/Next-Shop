@@ -28,7 +28,7 @@ export default function CategoryProductsPage() {
     fetchProducts();
   }, [slug]);
 
-  // 🛒 Professional Add to Cart Logic with LocalStorage
+
   const handleAddToCart = (product: any) => {
     try {
       const cart = JSON.parse(localStorage.getItem("cart") || "[]");
@@ -52,14 +52,14 @@ export default function CategoryProductsPage() {
       }
 
       localStorage.setItem("cart", JSON.stringify(cart));
-      
-      // Sync with Navbar
+
+
       window.dispatchEvent(new Event("storage"));
 
-      // Show previous style toast
+
       setCartMessage(`${product.name} added to cart successfully!`);
       setTimeout(() => setCartMessage(null), 3000);
-      
+
     } catch (error) {
       console.error("Cart sync error", error);
     }
@@ -77,7 +77,7 @@ export default function CategoryProductsPage() {
     <div className="relative">
       <Navbar />
 
-      {/* Professional Bottom Toast (Your preferred style) */}
+
       {cartMessage && (
         <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-[100] bg-[#0F172A] text-white px-6 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-bottom-5 duration-300">
           <div className="bg-green-500 rounded-full p-1">
@@ -88,7 +88,7 @@ export default function CategoryProductsPage() {
       )}
 
       <div className="min-h-screen bg-slate-50 pb-20">
-        {/* Header Section */}
+
         <div className="bg-white border-b border-slate-200 sticky top-0 z-20">
           <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -113,7 +113,7 @@ export default function CategoryProductsPage() {
           </div>
         </div>
 
-        {/* Product Grid */}
+
         <div className="max-w-7xl mx-auto px-4 mt-8">
           {products.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">

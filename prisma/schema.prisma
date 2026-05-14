@@ -1,5 +1,3 @@
-
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -9,25 +7,21 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ==========================================
-//          BETTER AUTH & USER MODELS       
-// ==========================================
-
 model User {
-  id            String    @id @map("_id")
+  id            String   @id @map("_id")
   name          String?
-  email         String    @unique
-  emailVerified Boolean   @default(false)
+  email         String   @unique
+  emailVerified Boolean  @default(false)
   image         String?
   phone         String?
   password      String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  role          Role      @default(USER)
-  
-  sessions      Session[]
-  accounts      Account[]
-  orders        Order[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  role          Role     @default(USER)
+
+  sessions Session[]
+  accounts Account[]
+  orders   Order[]
 
   @@map("user")
 }
@@ -83,10 +77,6 @@ enum Role {
   ADMIN
 }
 
-// ==========================================
-//          E-COMMERCE PRODUCT MODELS        
-// ==========================================
-
 model Brand {
   id       String    @id @default(auto()) @map("_id") @db.ObjectId
   name     String    @unique
@@ -106,7 +96,7 @@ model Category {
 model Attribute {
   id                    String                 @id @default(auto()) @map("_id") @db.ObjectId
   name                  String                 @unique
-  type                  String                 @default("text") 
+  type                  String                 @default("text")
   values                AttributeValue[]
   categoryAttributes    CategoryAttribute[]
   productSpecifications ProductSpecification[]
@@ -193,8 +183,6 @@ model CategoryAttribute {
   @@unique([categoryId, attributeId])
 }
 
-// feedback
-// Complain & Feedback Model
 model Feedback {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   fullName  String
@@ -209,25 +197,22 @@ model Feedback {
   @@map("feedbacks")
 }
 
-// model/schema.prisma
-
 model Offer {
-  id                 String   @id @default(auto()) @map("_id") @db.ObjectId
-  mainTitle          String
-  subHeadline        String
-  imageUrl           String
-  availability       String   @default("All Outlet")
-  startDate          DateTime
-  endDate            DateTime
-  emiLink            String?
-  status             String   @default("Draft")
-  
-  // JSON objects for rewards and terms
-  rewards            Json     // { emiAdvantage, couponCode, shippingDeal, maxCashback }
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  mainTitle    String
+  subHeadline  String
+  imageUrl     String
+  availability String   @default("All Outlet")
+  startDate    DateTime
+  endDate      DateTime
+  emiLink      String?
+  status       String   @default("Draft")
+
+  rewards            Json // { emiAdvantage, couponCode, shippingDeal, maxCashback }
   termsAndConditions String[] // Array of strings
-  
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model HeroSlider {
@@ -268,21 +253,19 @@ model featuredCategory {
   updatedAt      DateTime @updatedAt
 }
 
-// এটি একটি টাইপ হিসেবে থাকবে যা HeroSection এর ভেতরে এম্বেড হবে
 type MainBanner {
-  imageUrl       String
-  title          String
-  subtitle       String
-  buttonLink     String
+  imageUrl   String
+  title      String
+  subtitle   String
+  buttonLink String
 }
 
 model Order {
-  id            String      @id @default(auto()) @map("_id") @db.ObjectId
-  orderId       String      @unique
-  
-  // User Relation: Better Auth uses String ID, not ObjectId
-  userId        String?     
-  user          User?       @relation(fields: [userId], references: [id])
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  orderId String @unique
+
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id])
 
   customerName  String
   email         String
@@ -291,7 +274,7 @@ model Order {
   comment       String?
   totalAmount   Float
   shippingFee   Float
-  paymentMethod String      // "cod" or "online"
+  paymentMethod String // "cod" or "online"
   status        OrderStatus @default(PENDING)
   items         OrderItem[]
   createdAt     DateTime    @default(now())

@@ -16,7 +16,7 @@ export default function CartPage() {
   const [cart, setCart] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // কার্ট লোড করা
+
   useEffect(() => {
     const loadCart = () => {
       const savedCart = localStorage.getItem('cart');
@@ -28,15 +28,15 @@ export default function CartPage() {
     loadCart();
   }, []);
 
-  // কার্ট আপডেট এবং লোকাল স্টোরেজ সিঙ্ক
+
   const updateCart = (updatedCart: any[]) => {
     setCart(updatedCart);
     localStorage.setItem('cart', JSON.stringify(updatedCart));
-    // Navbar এর কাউন্টার আপডেট করার জন্য ইভেন্ট ফায়ার করা
+
     window.dispatchEvent(new Event('storage'));
   };
 
-  // পরিমাণ বাড়ানো বা কমানো
+
   const updateQuantity = (productId: string, change: number) => {
     const updatedCart = cart.map(item => {
       if (item.id === productId) {
@@ -48,14 +48,14 @@ export default function CartPage() {
     updateCart(updatedCart);
   };
 
-  // আইটেম রিমুভ করা
+
   const removeItem = (productId: string) => {
     const updatedCart = cart.filter(item => item.id !== productId);
     updateCart(updatedCart);
     toast.success('আইটেমটি কার্ট থেকে সরানো হয়েছে');
   };
 
-  // হিসাব নিকাশ
+
   const subtotal = cart.reduce((sum, item) => sum + (item.price * (item.qty || item.quantity || 1)), 0);
   const shipping = subtotal > 0 && subtotal < 1000 ? 60 : 0; // ১০০০ টাকার উপরে ফ্রি শিপিং
   const total = subtotal + shipping;
@@ -66,7 +66,7 @@ export default function CartPage() {
       toast.error('আপনার কার্ট খালি');
       return;
     }
-    // এখানে আপনার লগইন চেক লজিক
+
     router.push('/checkout');
   };
 
@@ -90,7 +90,7 @@ export default function CartPage() {
               Shopping <span className="text-primary underline decoration-4 underline-offset-8">Cart</span>
             </h1>
             <p className="text-slate-500 font-bold text-sm uppercase tracking-widest mt-1">
-               {cartCount} Items in your bag
+              {cartCount} Items in your bag
             </p>
           </div>
         </div>
@@ -98,7 +98,7 @@ export default function CartPage() {
         {cart.length === 0 ? (
           <Card className="p-16 text-center border-none shadow-2xl rounded-[40px] bg-white">
             <div className="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
-               <ShoppingBag className="w-12 h-12 text-slate-200" />
+              <ShoppingBag className="w-12 h-12 text-slate-200" />
             </div>
             <h2 className="text-3xl font-black text-slate-900 mb-3">আপনার কার্টটি খালি!</h2>
             <p className="text-slate-400 mb-8 text-lg font-medium">পছন্দের টেক প্রোডাক্ট গুলো খুঁজে নিতে আমাদের শপ ভিজিট করুন।</p>
@@ -111,8 +111,8 @@ export default function CartPage() {
           </Card>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 items-start">
-            
-            {/* Cart Items List */}
+
+
             <div className="lg:col-span-2 space-y-4">
               {cart.map((item) => (
                 <Card key={item.id} className="border-none shadow-sm hover:shadow-md transition-shadow rounded-3xl bg-white overflow-hidden">
@@ -125,12 +125,12 @@ export default function CartPage() {
                           className="w-full h-full object-contain mix-blend-multiply"
                         />
                       </div>
-                      
+
                       <div className="flex-1 flex flex-col justify-between">
                         <div className="flex justify-between items-start">
                           <div>
                             <h3 className="font-black text-xl text-slate-900 line-clamp-1">
-                               {item.name}
+                              {item.name}
                             </h3>
                             <p className="text-[10px] font-black text-primary uppercase mt-1 tracking-[0.2em]">Premium Product</p>
                           </div>
@@ -143,7 +143,7 @@ export default function CartPage() {
                             <Trash2 className="w-5 h-5" />
                           </Button>
                         </div>
-                        
+
                         <div className="flex items-end justify-between mt-6">
                           <div className="flex items-center bg-slate-100 rounded-xl p-1 border border-slate-200">
                             <Button
@@ -164,7 +164,7 @@ export default function CartPage() {
                               <Plus className="w-4 h-4 text-slate-600" />
                             </Button>
                           </div>
-                          
+
                           <div className="text-right">
                             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Total Price</p>
                             <p className="font-black text-2xl text-slate-900">
@@ -179,13 +179,13 @@ export default function CartPage() {
               ))}
             </div>
 
-            {/* Summary Sidebar */}
+
             <div className="lg:col-span-1">
               <Card className="sticky top-28 border-none shadow-2xl rounded-[35px] overflow-hidden bg-white">
                 <div className="bg-[#081621] p-8">
-                   <h2 className="text-2xl font-black text-white uppercase tracking-tighter italic flex items-center gap-3">
-                     <ShoppingBag className="w-6 h-6 text-primary" /> Order Summary
-                   </h2>
+                  <h2 className="text-2xl font-black text-white uppercase tracking-tighter italic flex items-center gap-3">
+                    <ShoppingBag className="w-6 h-6 text-primary" /> Order Summary
+                  </h2>
                 </div>
                 <CardContent className="p-8 space-y-6">
                   <div className="space-y-4">
@@ -203,17 +203,17 @@ export default function CartPage() {
                       <p className="text-[10px] font-bold text-slate-400">৳১০০০ এর বেশি অর্ডারে শিপিং ফ্রি!</p>
                     )}
                   </div>
-                  
+
                   <Separator className="bg-slate-100" />
-                  
+
                   <div className="flex justify-between items-center text-3xl font-black text-slate-900 italic">
                     <span className="text-sm not-italic font-bold text-slate-400 uppercase tracking-widest">Grand Total</span>
                     <span className="text-primary leading-none">৳{total.toLocaleString()}</span>
                   </div>
-                  
+
                   <div className="pt-6 space-y-4">
-                    <Button 
-                      className="w-full h-16 font-black bg-primary hover:bg-primary/90 text-white rounded-2xl text-xl uppercase shadow-xl shadow-primary/20 transition-all active:scale-95" 
+                    <Button
+                      className="w-full h-16 font-black bg-primary hover:bg-primary/90 text-white rounded-2xl text-xl uppercase shadow-xl shadow-primary/20 transition-all active:scale-95"
                       onClick={handleCheckout}
                     >
                       Confirm Order

@@ -12,13 +12,13 @@ import NewsArchivePage from '@/components/Home/NewsTicker';
 
 
 export default function HomePage() {
-  
+
   return (
     <div className="min-h-screen bg-slate-50 text-foreground">
       <Navbar />
       <main>
         <HeroBanner />
-        {/* <NewsTicker />/ */}
+
         <NewsArchivePage></NewsArchivePage>
         <ServiceGrid />
         <FeaturedCategories />

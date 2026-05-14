@@ -34,7 +34,7 @@ export default function CategorySelectionPage({ params }: PageProps) {
     notFound();
   }
 
-  // Convert slug back to proper Category type
+
   const categoryMap: Record<string, Category> = {
     'processor': 'Processor',
     'motherboard': 'Motherboard',

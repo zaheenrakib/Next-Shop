@@ -1,27 +1,27 @@
 "use client";
 
 import React, { useState } from "react";
-import { 
-  MessageSquare, 
-  Star, 
-  CheckCircle2, 
-  Trash2, 
-  User, 
-  Search, 
-  Filter, 
+import {
+  MessageSquare,
+  Star,
+  CheckCircle2,
+  Trash2,
+  User,
+  Search,
+  Filter,
   Reply,
   ShieldCheck
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-// Fake Data for Reviews
+
 const initialReviews = [
   { id: 1, user: "Sabbir Rahman", product: "RTX 4090 GPU", rating: 5, comment: "Excellent performance! The delivery was super fast.", date: "2 mins ago", status: "pending" },
   { id: 2, user: "Anika Tasnim", product: "Keychron Q1 Pro", rating: 4, comment: "The build quality is solid, but the price is a bit high.", date: "1 hour ago", status: "approved" },
   { id: 3, user: "Rakibul Islam", product: "AMD Ryzen 9", rating: 2, comment: "Box was damaged during shipping. Not happy.", date: "5 hours ago", status: "pending" },
 ];
 
-// Fake Data for Tickets
+
 const initialTickets = [
   { id: "TK-1024", subject: "Payment Failed", user: "Mehedi Hasan", priority: "High", status: "Open", date: "10 May, 2026" },
   { id: "TK-1025", subject: "Refund Request", user: "Jannat Akter", priority: "Medium", status: "In Progress", date: "09 May, 2026" },
@@ -29,25 +29,25 @@ const initialTickets = [
 ];
 
 export default function SupportAndReviews() {
-  const [activeTab, setActiveTab] = useState("reviews"); 
+  const [activeTab, setActiveTab] = useState("reviews");
   const [reviews, setReviews] = useState(initialReviews);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // --- Search Logic ---
-  // রিভিউ ফিল্টার করার লজিক (ইউজার নাম বা প্রোডাক্ট নাম দিয়ে)
-  const filteredReviews = reviews.filter(review => 
-    review.user.toLowerCase().includes(searchQuery.toLowerCase()) || 
+
+
+  const filteredReviews = reviews.filter(review =>
+    review.user.toLowerCase().includes(searchQuery.toLowerCase()) ||
     review.product.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // টিকেট ফিল্টার করার লজিক (ইউজার নাম বা সাবজেক্ট দিয়ে)
-  const filteredTickets = initialTickets.filter(ticket => 
-    ticket.user.toLowerCase().includes(searchQuery.toLowerCase()) || 
+
+  const filteredTickets = initialTickets.filter(ticket =>
+    ticket.user.toLowerCase().includes(searchQuery.toLowerCase()) ||
     ticket.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
     ticket.id.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Handlers for Reviews
+
   const handleApprove = (id: number) => {
     setReviews(reviews.map(r => r.id === id ? { ...r, status: "approved" } : r));
   };
@@ -58,7 +58,7 @@ export default function SupportAndReviews() {
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
+
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-black text-[#262B3B] flex items-center gap-2">
@@ -68,15 +68,15 @@ export default function SupportAndReviews() {
           <p className="text-gray-500 text-sm">Manage customer opinions and technical queries.</p>
         </div>
 
-        {/* Tab Switcher */}
+
         <div className="flex bg-gray-100 p-1 rounded-xl w-fit">
-          <button 
+          <button
             onClick={() => { setActiveTab("reviews"); setSearchQuery(""); }}
             className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${activeTab === "reviews" ? "bg-white text-[#FF5722] shadow-sm" : "text-gray-500 hover:text-[#262B3B]"}`}
           >
             Product Reviews
           </button>
-          <button 
+          <button
             onClick={() => { setActiveTab("tickets"); setSearchQuery(""); }}
             className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${activeTab === "tickets" ? "bg-white text-[#FF5722] shadow-sm" : "text-gray-500 hover:text-[#262B3B]"}`}
           >
@@ -85,12 +85,12 @@ export default function SupportAndReviews() {
         </div>
       </div>
 
-      {/* Filter Bar */}
+
       <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-wrap gap-4 items-center justify-between">
         <div className="relative flex-1 min-w-[280px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-          <input 
-            type="text" 
+          <input
+            type="text"
             value={searchQuery}
             placeholder={activeTab === "reviews" ? "Search by user or product..." : "Search by user, subject or ID..."}
             className="w-full pl-10 pr-4 py-2 bg-gray-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-[#FF5722]/20 outline-none transition-all"
@@ -104,7 +104,7 @@ export default function SupportAndReviews() {
 
       <AnimatePresence mode="wait">
         {activeTab === "reviews" ? (
-          <motion.div 
+          <motion.div
             key="reviews"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -136,7 +136,7 @@ export default function SupportAndReviews() {
 
                     <div className="flex items-center gap-2 self-end md:self-center">
                       {review.status === "pending" && (
-                        <button 
+                        <button
                           onClick={() => handleApprove(review.id)}
                           className="flex items-center gap-2 px-4 py-2 bg-green-50 text-green-600 rounded-xl text-xs font-black uppercase hover:bg-green-100 transition-all"
                         >
@@ -148,7 +148,7 @@ export default function SupportAndReviews() {
                           <CheckCircle2 size={14} /> Public
                         </div>
                       )}
-                      <button 
+                      <button
                         onClick={() => handleDeleteReview(review.id)}
                         className="p-2.5 bg-red-50 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all"
                       >
@@ -165,7 +165,7 @@ export default function SupportAndReviews() {
             )}
           </motion.div>
         ) : (
-          <motion.div 
+          <motion.div
             key="tickets"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -202,19 +202,17 @@ export default function SupportAndReviews() {
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <span className={`text-[10px] font-black px-2 py-1 rounded-md uppercase ${
-                          ticket.priority === 'High' ? 'bg-red-50 text-red-500' : 
+                        <span className={`text-[10px] font-black px-2 py-1 rounded-md uppercase ${ticket.priority === 'High' ? 'bg-red-50 text-red-500' :
                           ticket.priority === 'Medium' ? 'bg-orange-50 text-orange-500' : 'bg-green-50 text-green-500'
-                        }`}>
+                          }`}>
                           {ticket.priority}
                         </span>
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2 text-xs font-bold text-gray-600">
-                          <span className={`w-2 h-2 rounded-full ${
-                            ticket.status === 'Open' ? 'bg-green-500 animate-pulse' : 
+                          <span className={`w-2 h-2 rounded-full ${ticket.status === 'Open' ? 'bg-green-500 animate-pulse' :
                             ticket.status === 'In Progress' ? 'bg-blue-500' : 'bg-gray-400'
-                          }`}></span>
+                            }`}></span>
                           {ticket.status}
                         </div>
                       </td>

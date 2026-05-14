@@ -11,18 +11,18 @@ import Footer from '@/components/Footer';
 function SuccessContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  
-  // Hydration fix করার জন্য স্টেট
+
+
   const [isMounted, setIsMounted] = useState(false);
   const [orderId, setOrderId] = useState("");
 
-  // URL থেকে ডাটা নেওয়া
+
   const method = searchParams.get('method') || 'cod'; // default cod if null
   const orderIdFromUrl = searchParams.get('orderId');
 
   useEffect(() => {
     setIsMounted(true);
-    // সার্ভার ও ক্লায়েন্টের টাইম স্ট্যাম্পের অমিল এড়াতে মাউন্ট হওয়ার পর আইডি সেট করা
+
     if (orderIdFromUrl) {
       setOrderId(orderIdFromUrl);
     } else {
@@ -30,7 +30,7 @@ function SuccessContent() {
     }
   }, [orderIdFromUrl]);
 
-  // মাউন্ট হওয়ার আগে কিছু রেন্ডার করবে না (Hydration Error protection)
+
   if (!isMounted) {
     return (
       <div className="h-screen flex items-center justify-center">
@@ -45,14 +45,14 @@ function SuccessContent() {
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
       <Navbar />
-      
+
       <main className="container mx-auto px-4 pt-32 pb-20 flex justify-center">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="max-w-2xl w-full bg-white rounded-[2rem] shadow-xl shadow-slate-200/60 overflow-hidden border border-slate-100"
         >
-          {/* Header Banner - Color changes based on method */}
+
           <div className={`p-8 text-center ${isCOD ? 'bg-amber-50' : 'bg-green-50'}`}>
             <motion.div
               initial={{ scale: 0 }}
@@ -66,7 +66,7 @@ function SuccessContent() {
                 <CheckCircle2 className="w-10 h-10 text-green-600" />
               )}
             </motion.div>
-            
+
             <h1 className="text-3xl font-black text-slate-800 mb-2">
               {isCOD ? 'Order Placed!' : 'Payment Successful!'}
             </h1>
@@ -77,7 +77,7 @@ function SuccessContent() {
 
           <div className="p-8 md:p-12">
             <div className="grid md:grid-cols-2 gap-8 mb-10">
-              {/* Payment Method Card */}
+
               <div className="p-5 rounded-2xl bg-slate-50 border border-slate-100">
                 <div className="flex items-center gap-3 mb-2 text-slate-500 font-semibold text-sm uppercase tracking-wider">
                   <CreditCard className="w-4 h-4" />
@@ -88,7 +88,7 @@ function SuccessContent() {
                 </p>
               </div>
 
-              {/* Status Card */}
+
               <div className="p-5 rounded-2xl bg-slate-50 border border-slate-100">
                 <div className="flex items-center gap-3 mb-2 text-slate-500 font-semibold text-sm uppercase tracking-wider">
                   <Truck className="w-4 h-4" />
@@ -98,12 +98,12 @@ function SuccessContent() {
               </div>
             </div>
 
-            {/* Instruction Box */}
+
             <div className="bg-slate-900 rounded-2xl p-6 text-white mb-10 relative overflow-hidden">
               <div className="relative z-10">
                 <h3 className="font-bold text-lg mb-2">What happens next?</h3>
                 <p className="text-slate-300 text-sm leading-relaxed">
-                  {isCOD 
+                  {isCOD
                     ? "আমাদের একজন প্রতিনিধি আপনার অর্ডারটি নিশ্চিত করতে শীঘ্রই কল করবেন। ডেলিভারি এজেন্ট পৌঁছালে অনুগ্রহ করে নগদ টাকা প্রস্তুত রাখুন।"
                     : "আমরা আপনার পেমেন্টটি পেয়েছি। আপনার ইমেইলে একটি ইনভয়েস পাঠানো হয়েছে। আমরা শীঘ্রই আপনার পণ্যটি শিপিংয়ের জন্য প্রস্তুত করছি।"
                   }
@@ -114,15 +114,15 @@ function SuccessContent() {
               </div>
             </div>
 
-            {/* Action Buttons */}
+
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button 
+              <Button
                 onClick={() => router.push('/')}
                 className="flex-1 h-14 bg-[#3b49bb] hover:bg-[#2e3a9c] text-white rounded-xl font-bold text-lg shadow-lg shadow-blue-200 transition-all active:scale-95"
               >
                 Continue Shopping
               </Button>
-              <Button 
+              <Button
                 variant="outline"
                 onClick={() => router.push('/dashboard/orders')}
                 className="flex-1 h-14 border-slate-200 hover:bg-slate-50 rounded-xl font-bold text-lg transition-all active:scale-95 flex items-center justify-center gap-2 text-slate-700"
@@ -139,7 +139,7 @@ function SuccessContent() {
   );
 }
 
-// Full page wrapper with Suspense
+
 export default function OrderSuccessPage() {
   return (
     <Suspense fallback={

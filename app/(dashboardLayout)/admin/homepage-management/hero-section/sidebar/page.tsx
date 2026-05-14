@@ -6,12 +6,12 @@ import { CheckCircle2, XCircle, Loader2, Save, X, Image as ImageIcon } from "luc
 export default function SidePromotionManagement() {
   const [loading, setLoading] = useState(false);
   const [modal, setModal] = useState({ show: false, type: 'success' as 'success' | 'error', message: '' });
-  
+
   const [formData, setFormData] = useState({
     sidePromotion: { imageUrl: "", targetUrl: "" }
   });
 
-  // ডাটা ফেচিং - Path updated
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -36,7 +36,7 @@ export default function SidePromotionManagement() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
-      
+
       const result = await res.json();
 
       if (res.ok) {

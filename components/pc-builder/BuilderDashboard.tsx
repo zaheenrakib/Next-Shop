@@ -49,21 +49,21 @@ export default function PCBuilderDashboard() {
                   <div className={`p-4 rounded-xl ${isSelected ? 'bg-primary text-white' : 'bg-muted text-muted-foreground'}`}>
                     <Icon className="w-8 h-8" />
                   </div>
-                  
+
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
                       <h3 className="font-bold text-lg">{comp.category}</h3>
                       {comp.isRequired && <span className="text-[10px] bg-red-100 text-red-600 px-2 py-0.5 rounded-full font-bold uppercase">Required</span>}
                       {isSelected && <CheckCircle2 className="w-4 h-4 text-primary" />}
                     </div>
-                    
+
                     {isSelected ? (
                       <div className="mt-1 flex items-center gap-3">
                         <div className="relative w-12 h-12 rounded-lg overflow-hidden border">
-                          <Image 
-                            src={comp.selectedProduct!.images?.[0] || comp.selectedProduct!.image || 'https://images.unsplash.com/photo-1591405351990-4726e33df48c?w=400&h=400&fit=crop'} 
-                            alt={comp.selectedProduct!.name} 
-                            fill 
+                          <Image
+                            src={comp.selectedProduct!.images?.[0] || comp.selectedProduct!.image || 'https://images.unsplash.com/photo-1591405351990-4726e33df48c?w=400&h=400&fit=crop'}
+                            alt={comp.selectedProduct!.name}
+                            fill
                             className="object-cover"
                           />
                         </div>
@@ -83,9 +83,9 @@ export default function PCBuilderDashboard() {
                         <Link href={`/pc-builder/${comp.category.toLowerCase().replace(' ', '-')}`} className="flex-1 sm:flex-none">
                           <Button variant="outline" size="sm" className="w-full">Change</Button>
                         </Link>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
+                        <Button
+                          variant="ghost"
+                          size="icon"
                           className="text-destructive hover:bg-destructive/10"
                           onClick={() => removeComponent(comp.category)}
                         >
@@ -109,10 +109,10 @@ export default function PCBuilderDashboard() {
       </div>
 
       <div className="mt-10 flex justify-end">
-        <Button 
-          size="lg" 
-          className="px-10 font-bold tech-gradient" 
-          // disabled={!components.every(c => !c.isRequired || c.selectedProduct)}
+        <Button
+          size="lg"
+          className="px-10 font-bold tech-gradient"
+
         >
           Add to Cart
         </Button>

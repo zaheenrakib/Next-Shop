@@ -25,7 +25,7 @@ export async function getCategories() {
 
 export async function getCategoryTree() {
   const categories = await prisma.category.findMany();
-  
+
   const buildTree = (parentId: string | null = null): any[] => {
     return categories
       .filter(cat => cat.parentId === parentId)
@@ -38,7 +38,7 @@ export async function getCategoryTree() {
   return buildTree(null);
 }
 
-// নতুন ডিলিট ফাংশনটি নিচে যোগ করা হলো
+
 export async function deleteCategory(id: string) {
   return await prisma.category.delete({
     where: {
