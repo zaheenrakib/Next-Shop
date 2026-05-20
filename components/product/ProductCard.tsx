@@ -22,7 +22,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
       {saveAmount > 0 && (
         <div className="absolute top-0 left-0 z-10 bg-[#FF4D30] text-white text-[11px] px-3 py-1.5 rounded-br-2xl font-bold shadow-md">
-          Save: {saveAmount.toLocaleString()}৳
+          Save: {Number(saveAmount || 0).toLocaleString()}৳
         </div>
       )}
 
@@ -55,11 +55,11 @@ export default function ProductCard({ product }: ProductCardProps) {
 
           <div className="flex items-center gap-2">
             <span className="text-lg font-black text-[#FF4D30]">
-              {currentPrice.toLocaleString()}৳
+              {Number(currentPrice || 0).toLocaleString()}৳
             </span>
             {saveAmount > 0 && (
               <span className="text-xs text-gray-400 line-through font-medium">
-                {originalPrice.toLocaleString()}৳
+                {Number(originalPrice || 0).toLocaleString()}৳
               </span>
             )}
           </div>
